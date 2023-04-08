@@ -5,10 +5,12 @@ import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import "./TabsDetail.css";
+import { useLocation } from "react-router-dom";
+import FAQDetail from "../FAQDetail/FAQDetail";
+import AmenitiesDetail from "../AmenitiesDetail/AmenitiesDetail";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
-
   return (
     <div
       role="tabpanel"
@@ -41,7 +43,21 @@ function a11yProps(index) {
   };
 }
 
-const TabsDetail = () => {
+const TabsDetail = ({ roomData }) => {
+  const {
+    hotel_id,
+    id,
+    name,
+    price,
+    description,
+    area,
+    number_of_available_rooms,
+    view_direction,
+    bed_type,
+    avatar,
+    img_slider,
+    disabled,
+  } = roomData;
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -73,54 +89,48 @@ const TabsDetail = () => {
       >
         <Tab label="Tổng quan" {...a11yProps(0)} />
         <Tab label="Tiện nghi" {...a11yProps(1)} />
-        <Tab label="FAQ" {...a11yProps(2)} />
+        <Tab label="FAQs" {...a11yProps(2)} />
       </Tabs>
       <TabPanel value={value} index={0}>
         <div className="tab_info_wrapper">
           <div className="tab_info_top">
-            <p>
-              It is a long established fact that a reader will be distracted by
-              the readable content of a page when looking at its layout. The
-              point of using Lorem Ipsum is that it has a more-or-less normal
-              distribution of letters, as opposed to using 'Content here,
-              content here', making it look like readable English.
-            </p>
+            <p>{description}</p>
           </div>
           <div className="tab_info_bottom">
             <div className="tab_info_bottom_item">
-              <h4>Thong tin</h4>
+              <h4>Thông tin</h4>
               <ul>
-                <li>So luong: 4 nguoi</li>
-                <li>Dien tich: 108m2</li>
-                <li>Huong nhin: Truc dien bien</li>
-                <li>Loai giuong: double</li>
+                <li>Số lượng: {number_of_available_rooms}</li>
+                <li>Diện tích: {area}</li>
+                <li>Hướng nhìn: {view_direction}</li>
+                <li>Loại giường: {bed_type}</li>
               </ul>
             </div>
             <div className="tab_info_bottom_item">
-              <h4>Dac biet</h4>
+              <h4>Đặc biệt</h4>
               <ul>
                 <li>Fitness</li>
-                <li>Ho boi</li>
-                <li>Giat ui</li>
+                <li>Hồ bơi</li>
+                <li>Giặt ủi</li>
               </ul>
             </div>
             <div className="tab_info_bottom_item">
-              <h4>Dich vu khac</h4>
+              <h4>Dịch vụ khác</h4>
               <ul>
-                <li>spa</li>
-                <li>fitness</li>
-                <li>nha hang</li>
-                <li>quay bar</li>
+                <li>Spa</li>
+                <li>Yoga</li>
+                <li>Nhà hàng</li>
+                <li>Quẩy bar</li>
               </ul>
             </div>
           </div>
         </div>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
+        <AmenitiesDetail />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Item Three
+        <FAQDetail />
       </TabPanel>
     </Box>
   );

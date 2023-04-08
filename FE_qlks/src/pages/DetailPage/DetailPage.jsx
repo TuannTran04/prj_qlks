@@ -1,12 +1,13 @@
 import React from "react";
 import Slider from "react-slick";
-import { useLocation, useParams, Link } from "react-router-dom";
+import { useLocation, useParams, Link, useNavigate } from "react-router-dom";
 import "./DetailPage.css";
 import { SliderDetail } from "../../features/SliderDetail/SliderDetail";
 import TabsDetail from "../../features/TabsDetail/TabsDetail";
 import FormDetail from "../../features/FormDetail/FormDetail";
 
 const DetailPage = () => {
+  const navigate = useNavigate();
   // get param id on path
   const { id, name } = useParams();
   console.log(id, name);
@@ -18,6 +19,7 @@ const DetailPage = () => {
   console.log(roomData);
   // Check if location state exists
   if (!roomData) {
+    navigate("/page-not-found");
     return <div>Loading...</div>;
   }
   console.log(location.state.roomData);
@@ -36,7 +38,7 @@ const DetailPage = () => {
       <div className="detail_container">
         <div className="detail_item">
           <div className="detail_item_left">
-            <SliderDetail />
+            <SliderDetail roomData={roomData} />
           </div>
 
           <div className="detail_item_right">
@@ -46,7 +48,7 @@ const DetailPage = () => {
 
         <hr style={{ opacity: 0.4 }} />
 
-        <TabsDetail />
+        <TabsDetail roomData={roomData} />
 
         <hr style={{ opacity: 0.4 }} />
       </div>

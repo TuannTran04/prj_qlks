@@ -1,15 +1,16 @@
 import clsx from "clsx";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import { arrIconSoc, arrInputForm } from "./LoginConst";
 import { handleLogin } from "../../services/userService";
 import "./LoginPage.css";
 
 const LoginPage = (props) => {
+  const navigate = useNavigate();
   const [form, setFormValue] = useState({
     email: "",
     password: "",
-    rememberMe: JSON.parse(localStorage.getItem("remember-me")) ? true : false,
+    rememberMe: false,
   });
   // console.log(form);
   const { email, password, rememberMe } = form;
@@ -23,11 +24,11 @@ const LoginPage = (props) => {
 
   // show err when err
   const [errMessage, setErrMessage] = useState("");
-  console.log(errMessage);
+  // console.log(errMessage);
 
   // set value form when input change
   const handleChange = (e) => {
-    console.log([e.target]);
+    // console.log([e.target]);
     const { name, value } = e.target;
     if (name === "rememberMe") {
       setFormValue((prevState) => ({
@@ -53,7 +54,7 @@ const LoginPage = (props) => {
   // post data from client to server and get respone data from server
   const handleSubmit = async (e) => {
     setErrMessage("");
-    console.log(form);
+    // console.log(form);
     try {
       e.preventDefault();
       // setFormValue((prevState) => ({
@@ -62,7 +63,7 @@ const LoginPage = (props) => {
       //   password: "",
       // }));
       const response = await handleLogin(email, password);
-      console.log(response);
+      // console.log(response);
 
       if (response && response.errCode) {
         setErrMessage(response.message);
@@ -70,8 +71,9 @@ const LoginPage = (props) => {
         // logic when login success
         localStorage.setItem("info-user", JSON.stringify(response.user));
         window.location.href = "/";
+        navigate("/", { state: { userId: response.user.id } });
         alert("login success");
-        console.log("login success");
+        // console.log("login success");
       }
     } catch (error) {
       console.log(error);
@@ -82,22 +84,29 @@ const LoginPage = (props) => {
   // Prefill inputs if redirected from the register page
   useEffect(() => {
     if (location.state) {
+      localStorage.removeItem("remember-me");
       setFormValue((prevState) => ({
         ...prevState,
         ...location.state,
       }));
     }
-
-    if (rememberMe) {
-      setFormValue((prevState) => ({
-        ...prevState,
-        ...JSON.parse(localStorage.getItem("remember-me")),
-      }));
-    }
   }, [location.state]);
 
+  // Check có rememberData không và trong rememberData email password có phải là truthy không
   useEffect(() => {
-    if (rememberMe) {
+    const rememberData = JSON.parse(localStorage.getItem("remember-me"));
+    if (rememberData?.email && rememberData?.password) {
+      setFormValue((prevState) => ({
+        ...prevState,
+        ...rememberData,
+        rememberMe: true,
+      }));
+    }
+  }, []);
+
+  // Chỉ lưu vào local khi input được fill đầy đủ và có checkbox
+  useEffect(() => {
+    if (rememberMe && email && password) {
       localStorage.setItem("remember-me", JSON.stringify(form));
     } else {
       localStorage.removeItem("remember-me");
@@ -111,7 +120,7 @@ const LoginPage = (props) => {
       <div className="login_container">
         <div className="login_item">
           <h2 className="login_logo">
-            <i className="bx bxl-xing"></i>Hash Techie
+            <i className="bx bxl-xing"></i>TUAN TRAN
           </h2>
 
           <div className="login_text-item">
@@ -179,7 +188,7 @@ const LoginPage = (props) => {
                   />
                   Remember Me
                 </label>
-                {/* <a href="#">Forget Password</a> */}
+                <Link to="/forget-password">Forget Password</Link>
               </div>
 
               <div style={{ textAlign: "center", color: "red" }}>

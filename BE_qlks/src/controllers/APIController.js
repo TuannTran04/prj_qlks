@@ -13,6 +13,15 @@ let getAllUsers = async (req, res) => {
   });
 };
 
+let getInfoHotel = async (req, res) => {
+  const [hotel] = await pool.execute("SELECT * FROM `hotels`");
+
+  return res.status(200).json({
+    message: "ok",
+    data: hotel[0],
+  });
+};
+
 let getRooms = async (req, res) => {
   // rows la 1 arr chua cac phan tu obj row data trong table
   try {
@@ -55,7 +64,7 @@ let getSearch = async (req, res) => {
 let createBooking = async (req, res) => {
   // rows la 1 arr chua cac phan tu obj row data trong table
   try {
-    console.log(req.body);
+    // console.log(req.body);
 
     let dataBooking = await CRUDService.handleDataBooking(req.body);
 
@@ -66,15 +75,70 @@ let createBooking = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ error: err || "Internal server error" });
+  }
+};
+
+let getListFAQs = async (req, res) => {
+  const [listFAQs, fields] = await pool.execute(
+    "SELECT * FROM `faqs` WHERE disabled = 0"
+  );
+
+  return res.status(200).json({
+    message: "ok",
+    data: listFAQs,
+  });
+};
+
+let getListCuisine = async (req, res) => {
+  // rows la 1 arr chua cac phan tu obj row data trong table
+  try {
+    const page = parseInt(req.query.page) || 1; // Lấy trang hiện tại, mặc định là 1 nếu không có giá trị
+    const pageSize = parseInt(req.query.pageSize) || 5;
+    // console.log(">>> CHECK PAGE <<<: ", page);
+    // console.log(">>> CHECK PAGESIZE <<<: ", pageSize);
+    const dataCuisine = await CRUDService.getCuisines(page, pageSize);
+    // console.log(dataCuisine);
+    return res.status(200).json({
+      message: "ok",
+      total: dataCuisine.total,
+      data: dataCuisine.cuisineList,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+let getListService = async (req, res) => {
+  // rows la 1 arr chua cac phan tu obj row data trong table
+  try {
+    const page = parseInt(req.query.page) || 1; // Lấy trang hiện tại, mặc định là 1 nếu không có giá trị
+    const pageSize = parseInt(req.query.pageSize) || 5;
+    // console.log(">>> CHECK PAGE <<<: ", page);
+    // console.log(">>> CHECK PAGESIZE <<<: ", pageSize);
+    const dataService = await CRUDService.getServices(page, pageSize);
+    // console.log(dataService);
+    return res.status(200).json({
+      message: "ok",
+      total: dataService.total,
+      data: dataService.serviceList,
+    });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
 module.exports = {
   getAllUsers,
+  getInfoHotel,
   getRooms,
   getSearch,
   createBooking,
+  getListFAQs,
+  getListCuisine,
+  getListService,
 
   // createNewUser,
   // updateUser,

@@ -5,13 +5,14 @@ import { arrIconSoc, arrInputForm } from "./AdminLoginConst";
 import { handleAdminLogin } from "../../services/adminService";
 import "./AdminLogin.css";
 
-const AdminLogin = ({ onLogin }) => {
+const AdminLogin = () => {
   const [form, setFormValue] = useState({
     name: "",
     password: "",
-    rememberAdmin: JSON.parse(localStorage.getItem("remember-admin"))
-      ? true
-      : false,
+    rememberAdmin: false,
+    // rememberAdmin: JSON.parse(localStorage.getItem("remember-admin"))
+    //   ? true
+    //   : false,
   });
   // console.log(form);
   const { name, password, rememberAdmin } = form;
@@ -67,8 +68,7 @@ const AdminLogin = ({ onLogin }) => {
       } else {
         // logic when login success
         localStorage.setItem("info-admin", JSON.stringify(response.admin));
-        onLogin();
-        // window.location.href = "/admin";
+        window.location.href = "/admin";
         alert("login success");
         console.log("login success");
       }
@@ -81,22 +81,29 @@ const AdminLogin = ({ onLogin }) => {
   // Prefill inputs if redirected from the register page
   useEffect(() => {
     if (location.state) {
+      localStorage.removeItem("remember-admin");
       setFormValue((prevState) => ({
         ...prevState,
         ...location.state,
       }));
     }
-
-    if (rememberAdmin) {
-      setFormValue((prevState) => ({
-        ...prevState,
-        ...JSON.parse(localStorage.getItem("remember-admin")),
-      }));
-    }
   }, [location.state]);
 
+  // Check có rememberData không và trong rememberData email password có phải là truthy không
   useEffect(() => {
-    if (rememberAdmin) {
+    const rememberData = JSON.parse(localStorage.getItem("remember-admin"));
+    if (rememberData?.name && rememberData?.password) {
+      setFormValue((prevState) => ({
+        ...prevState,
+        ...rememberData,
+        rememberAdmin: true,
+      }));
+    }
+  }, []);
+
+  // Chỉ lưu vào local khi input được fill đầy đủ và có checkbox
+  useEffect(() => {
+    if (rememberAdmin && name && password) {
       localStorage.setItem("remember-admin", JSON.stringify(form));
     } else {
       localStorage.removeItem("remember-admin");
@@ -180,7 +187,7 @@ const AdminLogin = ({ onLogin }) => {
                   />
                   Remember Me
                 </label>
-                {/* <a href="#">Forget Password</a> */}
+                <Link to="/admin/forget-password">Forget Password</Link>
               </div>
 
               <div style={{ textAlign: "center", color: "red" }}>

@@ -17,14 +17,14 @@ const AdminHeader = () => {
 
         <div className="admin_nav_menu">
           <div className="admin_nav_info">
-            <ul>
+            {/* <ul>
               <li>
                 <Link to="/">Home</Link>
               </li>
               <li>
                 <Link to="/rooms">Rooms</Link>
               </li>
-            </ul>
+            </ul> */}
           </div>
 
           {infoAdmin && (

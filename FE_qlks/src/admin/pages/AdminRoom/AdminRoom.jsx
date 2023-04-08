@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
 import {
-  getRooms,
-  searchRooms,
+  getRoomsAdmin,
+  searchRoomsAdmin,
   deleteRoom,
   activeRoom,
 } from "../../services/adminService";
 import AdminPagination from "../../features/AdminPagination/AdminPagination";
 import "./AdminRoom.css";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const PAGE_SIZE = 5;
 
 const AdminRoom = () => {
+  const [searchParams] = useSearchParams();
+  const pageNumber = searchParams.get("page");
+  const navigate = useNavigate();
   const [rooms, setRooms] = useState([]);
   console.log(rooms);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(parseInt(pageNumber) || 1);
   const [totalPages, setTotalPages] = useState(0);
 
   const newUrl = `${window.location.pathname}?page=${currentPage}`;
@@ -28,6 +32,11 @@ const AdminRoom = () => {
       setRooms((prevRooms) => prevRooms.filter((room) => room.id !== roomId));
     } catch (err) {
       console.log(err);
+    }
+  };
+  const handleConfirmDelete = (roomId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa phòng này không?")) {
+      handleDeleteRoom(roomId);
     }
   };
 
@@ -63,11 +72,11 @@ const AdminRoom = () => {
     const renderRoom = async () => {
       try {
         if (searchQuery.trim() !== "") {
-          const res = await searchRooms(searchQuery);
+          const res = await searchRoomsAdmin(searchQuery);
           console.log(res);
           setRooms(res.data);
         } else {
-          const res = await getRooms(currentPage, PAGE_SIZE);
+          const res = await getRoomsAdmin(currentPage, PAGE_SIZE);
           // console.log(res.total);
           setRooms(res.data);
           setTotalPages(Math.ceil(res.total / PAGE_SIZE));
@@ -79,12 +88,15 @@ const AdminRoom = () => {
     renderRoom();
   }, [currentPage, searchQuery]);
 
+  // thay đổi page trên url thì update lại data
+  useEffect(() => {
+    setCurrentPage(parseInt(pageNumber) || 1);
+  }, [searchParams]);
+
   return (
     <div className="adminRoom_page">
       <div className="adminRoom_header">
         <h2>Manage Room</h2>
-
-        <a href="">Add room</a>
       </div>
 
       <form className="adminRoom_search">
@@ -97,6 +109,7 @@ const AdminRoom = () => {
             onChange={handleSearchInputChange}
           />
         </label>
+        <Link to="/admin/admin-add-room">Add room</Link>
       </form>
 
       <div className="adminRoom_wrap_list">
@@ -122,7 +135,8 @@ const AdminRoom = () => {
                   <td>
                     <img
                       className="adminRoom_room_img"
-                      src="../../assets/room_ks_1.jpg"
+                      // src="../../assets/room_ks_1.jpg"
+                      src={`http://localhost:9090${room.avatar}`}
                       alt="pic"
                     />
                   </td>
@@ -141,7 +155,12 @@ const AdminRoom = () => {
                   </td>
                   <td className="adminRoom_action">
                     <form action="">
-                      <button className="adminRoom_action-edit">
+                      <button
+                        className="adminRoom_action-edit"
+                        onClick={(e) => {
+                          navigate(`/admin/admin-edit-room/${room.id}`);
+                        }}
+                      >
                         <i className="fa-solid fa-pen"></i>
                       </button>
                     </form>
@@ -151,7 +170,7 @@ const AdminRoom = () => {
                         className="adminRoom_action-delete"
                         onClick={(e) => {
                           e.preventDefault();
-                          return handleDeleteRoom(room.id);
+                          return handleConfirmDelete(room.id);
                         }}
                       >
                         <i className="fa-solid fa-trash"></i>
@@ -182,16 +201,14 @@ const AdminRoom = () => {
               ))}
             </tbody>
           </table>
-
-          <AdminPagination
-            paginationData={{
-              currentPage,
-              totalPages,
-              newUrl,
-              setCurrentPage: setCurrentPage,
-            }}
-          />
         </div>
+        <AdminPagination
+          paginationData={{
+            currentPage,
+            totalPages,
+            setCurrentPage: setCurrentPage,
+          }}
+        />
       </div>
     </div>
   );

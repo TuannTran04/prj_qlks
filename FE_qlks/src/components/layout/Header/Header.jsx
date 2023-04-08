@@ -51,13 +51,22 @@ const Header = () => {
                 <NavLink to="/">Home</NavLink>
               </li>
               <li>
-                <NavLink to="/rooms">Rooms</NavLink>
+                <NavLink to="/product-page">Rooms</NavLink>
+              </li>
+              <li>
+                <NavLink to="/cuisine-page">Cuisines</NavLink>
+              </li>
+              <li>
+                <NavLink to="/service-page">Services</NavLink>
+              </li>
+              <li>
+                <NavLink to="/contact-page">Contact</NavLink>
               </li>
               {!infoUser && (
                 <>
-                  <li>
+                  {/* <li>
                     <NavLink to="/register">Register</NavLink>
-                  </li>
+                  </li> */}
                   <li>
                     <NavLink to="/login">Login</NavLink>
                   </li>

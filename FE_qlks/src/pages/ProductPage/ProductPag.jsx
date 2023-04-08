@@ -1,15 +1,12 @@
 import React from "react";
 import "./ProductPag.css";
-import Pagination from "react-bootstrap/Pagination";
 
 const ProductPag = ({ paginationData }) => {
-  const { currentPage, totalPages, newUrl, setCurrentPage } = paginationData;
+  const { currentPage, totalPages, setCurrentPage } = paginationData;
   //   console.log(paginationData);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    // Thay đổi URL trên trình duyệt
-    window.history.pushState(null, null, newUrl);
   };
 
   const renderPagination = () => {

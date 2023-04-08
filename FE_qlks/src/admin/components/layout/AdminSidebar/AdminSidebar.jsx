@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { arrTab } from "./AdminSidebarConst";
+import { arrTab, arrTab_2 } from "./AdminSidebarConst";
 import "./AdminSidebar.css";
 
 const AdminSidebar = ({ location }) => {
@@ -20,10 +20,35 @@ const AdminSidebar = ({ location }) => {
               <span>Home</span>
             </Link>
           </li>
+
+          <li className={getTabClass("/admin/admin-edit-info-hotel")}>
+            <Link to="/admin/admin-info-hotel">
+              <i className="fa-sharp fa-solid fa-circle-info"></i>
+              <span>Info Hotel</span>
+            </Link>
+          </li>
+
           <li className="adminSidebar_list_devider"></li>
 
           {arrTab.map((tab, i) => (
-            <li key={i} className={getTabClass(tab.path)}>
+            <li
+              key={i}
+              className={getTabClass(tab.path) + " adminSidebar_item"}
+            >
+              <Link to={tab.path}>
+                <i className={tab.icon}></i>
+                <span>{tab.name}</span>
+              </Link>
+            </li>
+          ))}
+
+          <li className="adminSidebar_list_devider"></li>
+
+          {arrTab_2.map((tab, i) => (
+            <li
+              key={i}
+              className={getTabClass(tab.path) + " adminSidebar_item"}
+            >
               <Link to={tab.path}>
                 <i className={tab.icon}></i>
                 <span>{tab.name}</span>

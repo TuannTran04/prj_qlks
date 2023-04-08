@@ -9,7 +9,7 @@
 }
 
 .detail_top_img {
-  background-image: url("/public/assets/DetailPage_img/beach_1.avif");
+  background-image: url("/public/assets/DetailPage_img/detail_top.jpg");
   display: block;
   width: 100%;
   height: 100%;
@@ -26,11 +26,11 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+  color: white;
 }
 
 .detail_top_heading {
   display: block;
-  color: black;
   font-size: 60px;
   text-transform: uppercase;
 }

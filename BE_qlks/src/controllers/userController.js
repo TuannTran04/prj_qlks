@@ -56,7 +56,55 @@ let createNewUser = async (req, res) => {
   });
 };
 
+let forgetPasswordUser = async (req, res) => {
+  let { email, password, confirmPassword } = req.body;
+  console.log(">>> CHECK RES.BODY <<<: ", req.body);
+
+  if (!email || !password || !confirmPassword) {
+    return res.status(200).json({
+      errCode: 1,
+      message: "missing required params",
+    });
+  }
+
+  let userData = await userService.forgetPasswordUser(req.body);
+  console.log(userData);
+
+  return res.status(200).json({
+    errCode: userData.errCode,
+    message: userData.errMessage,
+  });
+};
+
+let getUser = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const [user, fields] = await pool.execute(
+      "SELECT * FROM users where id = ?",
+      [userId]
+    );
+    if (!user || user.length === 0) {
+      return res.status(200).json({
+        message: "not found user",
+        data: {},
+      });
+    }
+
+    const { id, name, email } = user[0];
+
+    return res.status(200).json({
+      message: "get user ok",
+      data: user ? { id, name, email } : {},
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   handleLogin,
   createNewUser,
+  forgetPasswordUser,
+  getUser,
 };

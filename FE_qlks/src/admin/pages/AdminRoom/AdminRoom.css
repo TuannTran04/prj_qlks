@@ -11,7 +11,21 @@
 .adminRoom_header h2 {
 }
 
-.adminRoom_header a {
+.adminRoom_search {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.adminRoom_search label {
+  color: black;
+}
+.adminRoom_search input {
+  margin-left: 10px;
+  padding: 5px 20px;
+  outline: none;
+}
+.adminRoom_search a {
   font-size: 15px;
   background: #009688;
   border-color: #009688;
@@ -24,18 +38,6 @@
   padding: 6px 12px;
 }
 
-.adminRoom_search {
-  margin-bottom: 25px;
-}
-.adminRoom_search label {
-  color: black;
-}
-.adminRoom_search input {
-  margin-left: 10px;
-  padding: 5px 20px;
-  outline: none;
-}
-
 .adminRoom_wrap_list {
   background-color: #fff;
   padding: 28px;
@@ -43,7 +45,8 @@
 
 .adminRoom_list {
   width: 100%;
-  max-width: 1200px;
+  max-width: 100%;
+  /* max-width: 1200px; */
   max-height: 550px;
   overflow-x: auto;
   overflow-y: auto;

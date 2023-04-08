@@ -1,22 +1,36 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./About.module.css";
 import { Link } from "react-router-dom";
+import { getInfoHotelData } from "../../services/roomService";
 
 const About = () => {
+  const [hotelData, setHotelData] = useState({});
+  const [description, setDesciption] = useState([]);
+
+  useEffect(() => {
+    const renderHotelData = async () => {
+      try {
+        const res = await getInfoHotelData();
+        const newRes = {
+          ...res.data,
+        };
+        setHotelData(newRes);
+        setDesciption(res.data.description);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    renderHotelData();
+  }, []);
+
   return (
     <div className={styles.exceed_container}>
       <div className={styles.exceed_contain}>
         <div className={styles.exceed_content}>
           <div className={styles.exceed_left}>
             <h2>I'm Ready to Exceed Expectations</h2>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Suspendisse varius enim in eros elementum tristique. Duis cursus,
-              mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam
-              libero vitae erat. Aenean faucibus nibh et justo cursus id rutrum
-              lorem imperdiet
-            </p>
+            <p>{description}</p>
             <Link to="/rooms">More</Link>
           </div>
         </div>

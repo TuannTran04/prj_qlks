@@ -13,6 +13,7 @@ import connection from "./configs/connectDB.js";
 
 const app = express(); // create instant app ( ke thua cac method cua express, nhu Class ES6+)
 app.use(cors({ origin: true }));
+const bodyParser = require("body-parser");
 
 // Middleware morgan logging
 // app.use(morgan("combined"));
@@ -22,6 +23,9 @@ const port = process.env.PORT || 9090;
 // Cấu hình Express gửi POST request (gui data client len server va cta co the lay dc data 1 cach don gian)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 // Config View Engine EJS
 configViewEngine(app);

@@ -2,11 +2,9 @@ import React from "react";
 import "./AdminPagination.css";
 
 const AdminPagination = ({ paginationData }) => {
-  const { currentPage, totalPages, newUrl, setCurrentPage } = paginationData;
+  const { currentPage, totalPages, setCurrentPage } = paginationData;
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    // Thay đổi URL trên trình duyệt
-    window.history.pushState(null, null, newUrl);
   };
 
   const renderPagination = () => {

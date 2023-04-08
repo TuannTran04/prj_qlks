@@ -87,20 +87,23 @@ const FormDetail = ({ roomData }) => {
         // nếu kiểm tra qua các điều kiện trên thành công, tiếp tục submit form
         console.log("Form submitted:", form);
 
-        navigate("/booking", {
-          state: {
-            roomId: roomData.id,
-            nameRoom: roomData.name,
-            checkin,
-            checkout,
-            adults,
-            children,
-            stayMoney,
-            stayDays,
-            stayNights,
-            quantity: roomData.number_of_available_rooms,
-          },
-        });
+        navigate(
+          `/booking-page/${roomData.name.replace(/\s+/g, "-")}/${roomData.id}`,
+          {
+            state: {
+              roomId: roomData.id,
+              nameRoom: roomData.name,
+              checkin,
+              checkout,
+              adults,
+              children,
+              stayMoney,
+              stayDays,
+              stayNights,
+              quantity: roomData.number_of_available_rooms,
+            },
+          }
+        );
       }
     } else {
       alert("Đăng nhập để sử dụng chức năng này");
@@ -169,7 +172,7 @@ const FormDetail = ({ roomData }) => {
               />
             </div>
             <div className="detail_form_btn">
-              <Link to="/reservation" onClick={handleSubmit}>
+              <Link to="/booking" onClick={handleSubmit}>
                 ĐẶT NGAY
               </Link>
             </div>

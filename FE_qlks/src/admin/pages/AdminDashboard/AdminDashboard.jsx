@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import AdminHeader from "../../components/layout/AdminHeader/AdminHeader";
 import AdminSidebar from "../../components/layout/AdminSidebar/AdminSidebar";
+import AdminChart from "../AdminChart/AdminChart";
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
@@ -14,7 +15,7 @@ const AdminDashboard = () => {
       <div className="dashboard_page">
         <div className="dashboard_wrap_content">
           <div className="dashboard_content">
-            {isHome ? <h1>This is the Home Page</h1> : <Outlet />}
+            {isHome ? <AdminChart /> : <Outlet />}
           </div>
         </div>
       </div>

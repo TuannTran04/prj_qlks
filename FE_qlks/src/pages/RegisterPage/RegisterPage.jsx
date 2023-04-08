@@ -14,7 +14,7 @@ const RegisterPage = () => {
     name: "",
     confirmPassword: "",
   });
-  console.log(form);
+  // console.log(form);
 
   const inputPasswordRef = useRef();
   // console.log(inputPasswordRef.current);
@@ -71,14 +71,14 @@ const RegisterPage = () => {
         setErrMessage("Email không đúng định dạng");
         return;
       }
-      console.log(form);
+      // console.log(form);
       const response = await registerUser(
         email,
         password,
         name,
         confirmPassword
       );
-      console.log(response);
+      // console.log(response);
 
       if (response && response.errCode) {
         setErrMessage(response.message);
@@ -86,7 +86,7 @@ const RegisterPage = () => {
         // logic when login success
         navigate("/login", { state: { email, password } });
         alert("create success");
-        console.log("create success");
+        // console.log("create success");
       }
     } catch (error) {
       console.log(error);
@@ -101,13 +101,13 @@ const RegisterPage = () => {
       <div className="register_container">
         <div className="register_item">
           <h2 className="register_logo">
-            <i className="bx bxl-xing"></i>Hash Techie
+            <i className="bx bxl-xing"></i>TUAN TRAN
           </h2>
 
           <div className="register_text-item">
             <h2>
               Welcome! <br />
-              <span>To Kim Tuyen</span>
+              <span>To Kim Tuyen Hotel</span>
             </h2>
 
             <p>

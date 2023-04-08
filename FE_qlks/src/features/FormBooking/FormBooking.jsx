@@ -1,10 +1,22 @@
 import React, { useState } from "react";
-import { useLocation, useParams, Link, useNavigate } from "react-router-dom";
+import {
+  useLocation,
+  useParams,
+  Link,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import moment from "moment";
 import "./FormBooking.css";
 import { createBookings } from "../../services/roomService";
 
 const FormBooking = ({ infoBooking }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("info-user")
+    ? JSON.parse(localStorage.getItem("info-user")).id
+    : "";
+  // console.log(userId);
+
   const [form, setFormValue] = useState({
     name: "",
     email: "",
@@ -63,11 +75,13 @@ const FormBooking = ({ infoBooking }) => {
       alert("Email không đúng định dạng");
       return;
     }
-
-    const minusRoom = quantity > 0 ? quantity - 1 : 0;
+    if (quantity <= 0) {
+      alert("hết phòng");
+    }
 
     const dataBooking = {
       roomId,
+      userId,
       name,
       email,
       phone,
@@ -78,17 +92,20 @@ const FormBooking = ({ infoBooking }) => {
       totalGuests,
       totalStay,
       totalPrice,
-      quantityRoom: minusRoom,
+      quantityRoom: quantity,
     };
-
+    console.log(dataBooking);
     try {
       e.preventDefault();
 
       const response = await createBookings(dataBooking);
       console.log(response);
       alert("booking success");
+      navigate("/");
     } catch (error) {
       console.log(error);
+      console.log(error.response.data.error.error);
+      alert(error.response.data.error.error || "booking error");
     }
   };
 

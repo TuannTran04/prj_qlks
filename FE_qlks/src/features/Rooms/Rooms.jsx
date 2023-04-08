@@ -6,21 +6,21 @@ const Rooms = () => {
   const arrRooms = [
     {
       id: 1,
-      heading: "Phong khach san",
-      para: "Voi dien tich 30m2, mang den khong gian sang trong thoai mai...",
-      imgLink: "room_ks_3.jpg",
+      heading: "Phòng khách sạn",
+      para: "Với diện tích 30m2, mang đến không gian sang trọng và thoải mái để phục vụ tận tậm, chu đáo cho quý khách...",
+      imgLink: "home_rooms_1.jpg",
     },
     {
       id: 2,
-      heading: "Phong khach san",
-      para: "Voi dien tich 40m2, mang den khong gian sang trong thoai mai...",
-      imgLink: "room_ks_3.jpg",
+      heading: "Phòng khách sạn",
+      para: "Với diện tích 40m2, mang đến không gian sang trọng và thoải mái để phục vụ tận tậm, chu đáo cho quý khách...",
+      imgLink: "home_rooms_2.jpg",
     },
     {
       id: 3,
-      heading: "Phong khach san",
-      para: "Voi dien tich 50m2, mang den khong gian sang trong thoai mai...",
-      imgLink: "room_ks_3.jpg",
+      heading: "Phòng khách sạn",
+      para: "Với diện tích 50m2, mang đến không gian sang trọng và thoải mái để phục vụ tận tậm, chu đáo cho quý khách...",
+      imgLink: "home_rooms_3.jpg",
     },
   ];
   return (
