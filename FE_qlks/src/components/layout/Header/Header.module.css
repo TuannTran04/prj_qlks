@@ -135,7 +135,12 @@ body::-webkit-scrollbar-track {
 .nav_logOut h4 {
   font-size: 12px;
   color: pink;
+  cursor: pointer;
   /* padding-right: 10px; */
+}
+.nav_logOut h4:hover {
+  text-decoration: underline 1.5px;
+  text-decoration-color: pink;
 }
 
 .nav_logOut a {

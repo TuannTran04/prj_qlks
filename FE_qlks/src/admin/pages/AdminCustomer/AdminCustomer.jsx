@@ -12,6 +12,9 @@ import "./AdminCustomer.css";
 const PAGE_SIZE = 5;
 
 const AdminCustomer = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const [searchParams] = useSearchParams();
   const pageNumber = searchParams.get("page");
   const navigate = useNavigate();
@@ -27,13 +30,14 @@ const AdminCustomer = () => {
   const handleDeleteCustomer = async (customerId) => {
     try {
       console.log(customerId);
-      const res = await deleteCustomer(customerId);
+      const res = await deleteCustomer(customerId, admin_id);
       console.log(res);
       setCustomers((prevCustomers) =>
         prevCustomers.filter((customer) => customer.id !== customerId)
       );
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "DELETE error");
     }
   };
   const handleConfirmDelete = (customerId) => {
@@ -47,7 +51,7 @@ const AdminCustomer = () => {
       // console.log(roomId, roomDisableb);
       const toggleActive = customerDisableb === 0 ? 1 : 0;
       // console.log(toggleActive);
-      const res = await activeCustomer(customerId, toggleActive);
+      const res = await activeCustomer(customerId, toggleActive, admin_id);
       console.log(res);
       setCustomers((prevCustomers) => {
         const updatedCustomers = prevCustomers.map((customer) => {
@@ -63,6 +67,7 @@ const AdminCustomer = () => {
       });
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "ACTIVE error");
     }
   };
 

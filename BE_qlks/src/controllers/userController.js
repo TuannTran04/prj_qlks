@@ -78,26 +78,73 @@ let forgetPasswordUser = async (req, res) => {
 
 let getUser = async (req, res) => {
   try {
-    const userId = req.query.userId;
-    const [user, fields] = await pool.execute(
-      "SELECT * FROM users where id = ?",
-      [userId]
+    const customerId = req.query.customerId;
+    const [customer, fields] = await pool.execute(
+      "SELECT * FROM customers where id = ?",
+      [customerId]
     );
-    if (!user || user.length === 0) {
+    if (!customer || customer.length === 0) {
       return res.status(200).json({
-        message: "not found user",
+        message: "not found customer",
         data: {},
       });
     }
 
-    const { id, name, email } = user[0];
+    const { id, name, email } = customer[0];
 
     return res.status(200).json({
-      message: "get user ok",
-      data: user ? { id, name, email } : {},
+      message: "get customer ok",
+      data: customer ? { id, name, email } : {},
     });
   } catch (e) {
     console.log(e);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+let getBookingsAccount = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1; // Lấy trang hiện tại, mặc định là 1 nếu không có giá trị
+    const pageSize = parseInt(req.query.pageSize) || 5;
+    const customerId = parseInt(req.query.customerId);
+    // console.log(">>> CHECK PAGE <<<: ", page);
+    // console.log(">>> CHECK PAGESIZE <<<: ", pageSize);
+    // console.log(">>> CHECK PAGESIZE <<<: ", customerId);
+    const dataBooking = await userService.getBookings(
+      page,
+      pageSize,
+      customerId
+    );
+    // console.log(dataBooking);
+    return res.status(200).json({
+      message: "ok",
+      total: dataBooking.total,
+      data: dataBooking.bookingList,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+let getSearchBookingsAccount = async (req, res) => {
+  try {
+    const customerId = parseInt(req.query.customerId);
+    const [bookingList, fields] = await pool.execute(
+      "SELECT * FROM bookings WHERE customer_id = ?",
+      [customerId]
+    );
+    console.log(bookingList);
+    const query = req.query.q; // Lấy thông tin từ query parameter q
+    const results = bookingList.filter((booking) =>
+      booking.guest_name.toLowerCase().includes(query.toLowerCase())
+    );
+    res.status(200).json({
+      message: "search success",
+      data: results,
+    });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -107,4 +154,6 @@ module.exports = {
   createNewUser,
   forgetPasswordUser,
   getUser,
+  getBookingsAccount,
+  getSearchBookingsAccount,
 };

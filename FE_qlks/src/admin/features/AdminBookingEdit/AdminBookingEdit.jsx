@@ -5,16 +5,19 @@ import { getBookingEdit, editBooking } from "../../services/adminService";
 import "./AdminBookingEdit.css";
 
 const AdminBookingEdit = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const navigate = useNavigate();
   const today = new Date().toISOString().slice(0, 10);
   const { bookingId } = useParams();
   const [reload, setReload] = useState(true);
   // console.log(bookingId);
   const [rooms, setRooms] = useState([]);
-  // console.log(rooms);
+  console.log(rooms);
   const [priceRoom, setPriceRoom] = useState([]);
   const [totalPriceRoom, setTotalPriceRoom] = useState();
-  // console.log(totalPriceRoom);
+  console.log(totalPriceRoom);
 
   const [form, setFormValue] = useState({
     room_id: "",
@@ -27,6 +30,7 @@ const AdminBookingEdit = () => {
     total_price: "",
     total_stay: "",
     guest_mess: "",
+    admin_id,
   });
   console.log(form);
 
@@ -101,6 +105,7 @@ const AdminBookingEdit = () => {
         total_price,
         total_stay,
         guest_mess,
+        admin_id,
       };
       console.log(formData);
 
@@ -110,10 +115,10 @@ const AdminBookingEdit = () => {
 
       // reload lại page để nhận lại data mới từ csdl, rồi update lại data client
       setReload((prev) => !prev);
-      navigate("/admin/admin-booking");
+      // navigate("/admin/admin-booking");
     } catch (error) {
       console.log(error);
-      alert(error);
+      alert(error.response.data.error || "EDIT error");
     }
   };
 
@@ -162,6 +167,9 @@ const AdminBookingEdit = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const adminIdFromLocalStorage = localStorage.getItem("info-admin")
+          ? JSON.parse(localStorage.getItem("info-admin")).id
+          : "";
         const res = await getBookingEdit(bookingId);
         // console.log(res);
         const newRes = {
@@ -172,6 +180,7 @@ const AdminBookingEdit = () => {
         setFormValue((prevState) => ({
           ...prevState,
           ...newRes,
+          admin_id: adminIdFromLocalStorage,
         }));
         setRooms(res.roomList);
 
@@ -200,17 +209,19 @@ const AdminBookingEdit = () => {
             >
               {/* <option value="">Select a room</option> */}
               {rooms.map((room) => {
-                if (room.number_of_available_rooms > 0 && room.disabled === 0)
-                  return (
-                    <option
-                      key={room.id}
-                      value={room.id}
-                      data-room={room.name}
-                      data-price={room.price}
-                    >
-                      {room.name}
-                    </option>
-                  );
+                {
+                  /* if (room.number_of_available_rooms > 0 && room.disabled === 0) */
+                }
+                return (
+                  <option
+                    key={room.id}
+                    value={room.id}
+                    data-room={room.name}
+                    data-price={room.price}
+                  >
+                    {room.name}
+                  </option>
+                );
               })}
             </select>
           </div>

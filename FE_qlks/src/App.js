@@ -38,6 +38,8 @@ import AdminAddService from "./admin/features/AdminAddService/AdminAddService";
 import AdminServiceEdit from "./admin/features/AdminServiceEdit/AdminServiceEdit";
 import AdminInfoHotel from "./admin/pages/AdminHotel/AdminInfoHotel";
 import AdminInfoHotelEdit from "./admin/features/AdminInfoHotelEdit/AdminInfoHotelEdit";
+import AccountPage from "./pages/AccountPage/AccountPage";
+import HistoryBookingPage from "./pages/HistoryBookingPage/HistoryBookingPage";
 
 function App() {
   const { pathname } = useLocation();
@@ -77,6 +79,16 @@ function App() {
             isUserLoggedIn ? <Navigate to="/" /> : <ForgetPasswordPage />
           }
         />
+        <Route
+          path="/account-page"
+          element={isUserLoggedIn ? <AccountPage /> : <Navigate to="/" />}
+        >
+          <Route
+            path="/account-page/history-booking"
+            element={<HistoryBookingPage />}
+          />
+        </Route>
+
         <Route path="/" element={<HomePage />} />
         <Route path="/product-page" element={<ProductPage />} />
         <Route path="/detail-page/:name/:id" element={<DetailPage />} />

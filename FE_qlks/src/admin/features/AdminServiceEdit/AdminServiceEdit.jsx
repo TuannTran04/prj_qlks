@@ -5,6 +5,9 @@ import { editService, getServicesAdmin } from "../../services/adminService";
 import "./AdminServiceEdit.css";
 
 const AdminServiceEdit = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const { serviceId } = useParams();
   const [form, setFormValue] = useState({
     name: "",
@@ -12,6 +15,7 @@ const AdminServiceEdit = () => {
     closing_time: "",
     description: "",
     img_slider: ["", "", "", "", ""],
+    admin_id,
   });
   console.log(form);
 
@@ -67,13 +71,16 @@ const AdminServiceEdit = () => {
       alert(response.message);
     } catch (error) {
       console.log(error);
-      alert(error);
+      alert(error.response.data.error || "EDIT error");
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const adminIdFromLocalStorage = localStorage.getItem("info-admin")
+          ? JSON.parse(localStorage.getItem("info-admin")).id
+          : "";
         const res = await getServicesAdmin(null, null, serviceId);
         console.log(res.data[0]);
         const newRes = {
@@ -84,6 +91,7 @@ const AdminServiceEdit = () => {
         setFormValue((prevState) => ({
           ...prevState,
           ...newRes,
+          admin_id: adminIdFromLocalStorage,
         }));
         // setIsLoading(false);
       } catch (error) {

@@ -53,9 +53,10 @@ let handleDataBooking = (dataBooking) => {
       const quantityRoom = parseInt(room[0].number_of_available_rooms);
       console.log(">>> CHECK QUANTITY ROOM <<<", quantityRoom);
 
-      const [user] = await pool.execute(`SELECT * FROM users WHERE id = ? `, [
-        userId,
-      ]);
+      const [user] = await pool.execute(
+        `SELECT * FROM customers WHERE id = ? `,
+        [userId]
+      );
       console.log(">>> CHECK USER EXIST <<<:", user);
 
       if (user.length === 0) {
@@ -78,7 +79,7 @@ let handleDataBooking = (dataBooking) => {
         [theRestQuantityRoom, nameRoom]
       );
 
-      const sql = `INSERT INTO bookings (room_id, user_id, room_name, checkin_date, checkout_date, guest_name, guest_email, guest_phone, guest_mess, total_stay, total_guests, total_price) VALUES (?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      const sql = `INSERT INTO bookings (room_id, customer_id, room_name, checkin_date, checkout_date, guest_name, guest_email, guest_phone, guest_mess, total_stay, total_guests, total_price) VALUES (?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
       await pool.execute(sql, [
         roomId,
         userId,

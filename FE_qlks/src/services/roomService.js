@@ -9,6 +9,9 @@ const getRooms = (currentPage, PAGE_SIZE) => {
     `/api/v1/get-list-rooms?page=${currentPage}&pageSize=${PAGE_SIZE}`
   );
 };
+const getRoomsRelated = (roomId) => {
+  return axios.get(`/api/v1/get-list-rooms-related?roomId=${roomId}`);
+};
 const createBookings = (dataBooking) => {
   return axios.post("/api/v1/create-booking", dataBooking);
 };
@@ -29,6 +32,7 @@ const getListService = (currentPage, PAGE_SIZE) => {
 export {
   getInfoHotelData,
   getRooms,
+  getRoomsRelated,
   createBookings,
   getListFAQs,
   getListCuisine,

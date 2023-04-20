@@ -8,6 +8,9 @@ import {
 } from "../../services/adminService";
 
 const AdminInfoHotelEdit = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const { hotelId } = useParams();
   console.log(hotelId);
 
@@ -21,6 +24,7 @@ const AdminInfoHotelEdit = () => {
     slider_home: ["c", "c", "c"],
     slider_ins: ["", "", "", "", ""],
     src_ggmap: "",
+    admin_id,
   });
   console.log(form);
 
@@ -81,13 +85,16 @@ const AdminInfoHotelEdit = () => {
       alert(response.message);
     } catch (error) {
       console.log(error);
-      alert(error);
+      alert(error.response.data.error || "EDIT error");
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const adminIdFromLocalStorage = localStorage.getItem("info-admin")
+          ? JSON.parse(localStorage.getItem("info-admin")).id
+          : "";
         const res = await getInfoHotelAdmin(hotelId);
         console.log(res.data);
         if (res.data.length === 0) {
@@ -98,7 +105,11 @@ const AdminInfoHotelEdit = () => {
             slider_home: JSON.parse(res.data[0].slider_home),
             slider_ins: JSON.parse(res.data[0].slider_ins),
           };
-          setFormValue(newRes);
+          setFormValue((prevState) => ({
+            ...prevState,
+            ...newRes,
+            admin_id: adminIdFromLocalStorage,
+          }));
         }
         // setIsLoading(false);
       } catch (error) {

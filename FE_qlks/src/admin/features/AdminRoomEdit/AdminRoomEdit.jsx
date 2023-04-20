@@ -4,6 +4,10 @@ import { getRoomEdit, editRoom } from "../../services/adminService";
 import "./AdminRoomEdit.css";
 
 const AdminEditRoom = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
+  console.log(admin_id);
   const { roomId } = useParams();
   const navigate = useNavigate();
   // console.log(roomId);
@@ -19,6 +23,7 @@ const AdminEditRoom = () => {
     imageUrlTemp: "",
     avatar: "",
     img_slider: ["", "", "", "", ""],
+    admin_id: admin_id,
   });
   console.log(form);
 
@@ -112,13 +117,16 @@ const AdminEditRoom = () => {
       navigate("/admin/admin-room");
     } catch (error) {
       console.log(error);
-      alert(error);
+      alert(error.response.data.error || "EDIT error");
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const adminIdFromLocalStorage = localStorage.getItem("info-admin")
+          ? JSON.parse(localStorage.getItem("info-admin")).id
+          : "";
         const res = await getRoomEdit(roomId);
         const newRes = {
           ...res.data,
@@ -128,6 +136,7 @@ const AdminEditRoom = () => {
         setFormValue((prevState) => ({
           ...prevState,
           ...newRes,
+          admin_id: adminIdFromLocalStorage,
         }));
         // setIsLoading(false);
       } catch (error) {

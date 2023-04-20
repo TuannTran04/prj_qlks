@@ -4,6 +4,9 @@ import { editFAQ, getFAQsAdmin } from "../../services/adminService";
 import "./AdminFAQEdit.css";
 
 const AdminFAQEdit = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const { faqId } = useParams();
   console.log(faqId);
 
@@ -11,6 +14,7 @@ const AdminFAQEdit = () => {
     id: 0,
     question: "",
     answer: "",
+    admin_id,
   });
   console.log(form);
 
@@ -40,19 +44,27 @@ const AdminFAQEdit = () => {
       alert(response.message);
     } catch (error) {
       console.log(error);
-      alert(error);
+      alert(error.response.data.error || "EDIT error");
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const adminIdFromLocalStorage = localStorage.getItem("info-admin")
+          ? JSON.parse(localStorage.getItem("info-admin")).id
+          : "";
         const res = await getFAQsAdmin(null, null, faqId);
         console.log(res);
         if (res.data.length === 0) {
           throw new Error("khong co faq nay");
         } else {
-          setFormValue(...res.data);
+          // setFormValue(...res.data);
+          setFormValue((prevState) => ({
+            ...prevState,
+            ...res.data[0],
+            admin_id: adminIdFromLocalStorage,
+          }));
         }
 
         // setIsLoading(false);

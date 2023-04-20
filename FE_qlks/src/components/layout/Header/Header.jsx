@@ -1,16 +1,28 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import styles from "./Header.module.css";
-import { Routes, Route, Link, Navigate, NavLink } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  NavLink,
+  useNavigate,
+} from "react-router-dom";
 import Logout from "../Logout/Logout";
 
 // console.log(styles);
 
 const Header = () => {
+  const nav = useNavigate();
   const [hideNavInfo, setHideNavInfo] = useState(false);
 
   const infoUser = JSON.parse(localStorage.getItem("info-user"));
   // console.log(infoUser);
+
+  const handleNavAccountPage = () => {
+    nav("/account-page");
+  };
 
   useEffect(() => {
     const handleShowNav = () => {
@@ -77,7 +89,7 @@ const Header = () => {
 
           {infoUser && (
             <div className={styles.nav_logOut}>
-              <h4>
+              <h4 onClick={handleNavAccountPage}>
                 <i>Xin chào, {infoUser.name}</i>
               </h4>
 

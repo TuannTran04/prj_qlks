@@ -13,6 +13,9 @@ import "./AdminContact.css";
 const PAGE_SIZE = 5;
 
 const AdminContact = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const [searchParams] = useSearchParams();
   const pageNumber = searchParams.get("page");
   const navigate = useNavigate();
@@ -29,13 +32,14 @@ const AdminContact = () => {
   const handleDeleteContact = async (contactId) => {
     try {
       console.log(contactId);
-      const res = await deleteContact(contactId);
+      const res = await deleteContact(contactId, admin_id);
       console.log(res);
       setContacts((prevContacts) =>
         prevContacts.filter((contact) => contact.id !== contactId)
       );
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "DELETE error");
     }
   };
   const handleConfirmDelete = (contactId) => {

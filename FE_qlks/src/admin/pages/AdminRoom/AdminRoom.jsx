@@ -12,6 +12,9 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 const PAGE_SIZE = 5;
 
 const AdminRoom = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const [searchParams] = useSearchParams();
   const pageNumber = searchParams.get("page");
   const navigate = useNavigate();
@@ -27,11 +30,12 @@ const AdminRoom = () => {
   const handleDeleteRoom = async (roomId) => {
     try {
       console.log(roomId);
-      const res = await deleteRoom(roomId);
+      const res = await deleteRoom(roomId, admin_id);
       console.log(res);
       setRooms((prevRooms) => prevRooms.filter((room) => room.id !== roomId));
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "DELETE error");
     }
   };
   const handleConfirmDelete = (roomId) => {
@@ -45,7 +49,7 @@ const AdminRoom = () => {
       // console.log(roomId, roomDisableb);
       const toggleActive = roomDisableb === 0 ? 1 : 0;
       // console.log(toggleActive);
-      const res = await activeRoom(roomId, toggleActive);
+      const res = await activeRoom(roomId, toggleActive, admin_id);
       console.log(res);
       setRooms((prevRooms) => {
         const updatedRooms = prevRooms.map((room) => {
@@ -61,6 +65,7 @@ const AdminRoom = () => {
       });
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "ACTIVE error");
     }
   };
 

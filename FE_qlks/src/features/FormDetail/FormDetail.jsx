@@ -16,7 +16,7 @@ const FormDetail = ({ roomData }) => {
     adults: 0,
     children: 0,
   });
-  console.log(form);
+  // console.log(form);
 
   const { checkin, checkout, adults, children } = form;
 
@@ -27,7 +27,7 @@ const FormDetail = ({ roomData }) => {
       // format lại giá trị ngày tháng nhập vào theo định dạng dd-mm-yyyy
       const [day, month, year] = value.split("-");
       const formattedValue = `${day}-${month}-${year}`;
-      console.log(formattedValue);
+      // console.log(formattedValue);
 
       setFormValue((prevState) => ({
         ...prevState,
@@ -56,7 +56,7 @@ const FormDetail = ({ roomData }) => {
   //   console.log(checkoutDate.hour());
   // Tính số tiền
   const stayMoney = stayDays * roomData.price;
-  console.log(stayMoney);
+  // console.log(stayMoney);
 
   const handleSubmit = (e) => {
     e.preventDefault(); // prevent default form submission behavior
@@ -85,7 +85,7 @@ const FormDetail = ({ roomData }) => {
         }
 
         // nếu kiểm tra qua các điều kiện trên thành công, tiếp tục submit form
-        console.log("Form submitted:", form);
+        // console.log("Form submitted:", form);
 
         navigate(
           `/booking-page/${roomData.name.replace(/\s+/g, "-")}/${roomData.id}`,

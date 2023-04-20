@@ -25,8 +25,13 @@ let getInfoHotelAdmin = async (req, res) => {
 let editInfoHotelAdmin = async (req, res) => {
   try {
     const hotelId = parseInt(req.query.hotelId);
+    const { admin_id } = req.body;
     console.log(">>> CHECK hotelId <<<: ", hotelId);
     console.log(">>> CHECK RES.BODY <<<: ", req.body);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     const dataRes = await adminService.handleEditInfoHotelAdmin(
       hotelId,
@@ -85,8 +90,12 @@ let getSearchRoomsAdmin = async (req, res) => {
 
 let createNewRoom = async (req, res) => {
   try {
-    let { name } = req.body;
+    let { name, admin_id } = req.body;
     console.log(">>> CHECK RES.BODY <<<: ", req.body);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     // console.log(">>> CHECK RES.Files <<<: ", req.files);
     // const imagePath = req.file.path;
@@ -100,7 +109,12 @@ let createNewRoom = async (req, res) => {
     const [hotel] = await pool.execute("SELECT id FROM hotels");
     // console.log(hotel);
     const hotelId = hotel[0].id;
-    const dataRoom = await adminService.createRoom(hotelId, imgPath, req.body);
+    const dataRoom = await adminService.createRoom(
+      admin_id,
+      hotelId,
+      imgPath,
+      req.body
+    );
 
     return res.status(200).json({
       message: "create success",
@@ -132,7 +146,13 @@ let editRoomAdmin = async (req, res) => {
   try {
     const roomId = parseInt(req.query.roomId);
     const roomName = req.body.name;
+    const admin_id = req.body.admin_id;
+    // console.log(">>> CHECK ADMIN ID <<<", admin_id);
     let imgPath = "";
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     console.log(">>> CHECK RES.BODY <<<: ", req.body);
     if (req.file && req.file.filename) {
@@ -144,6 +164,7 @@ let editRoomAdmin = async (req, res) => {
     }
 
     const dataRes = await adminService.handleEditRoom(
+      admin_id,
       roomId,
       imgPath,
       req.body
@@ -163,7 +184,13 @@ let editRoomAdmin = async (req, res) => {
 let deleteRoomAdmin = async (req, res) => {
   try {
     let roomId = req.body.roomId;
+    let admin_id = req.body.admin_id;
     // console.log(">>> CHECK ROOM ID DELETE <<<: ", roomId);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
+
     await pool.execute(`DELETE FROM bookings WHERE room_id = ?`, [roomId]);
 
     await pool.execute("delete from rooms where id = ?", [roomId]);
@@ -180,12 +207,17 @@ let deleteRoomAdmin = async (req, res) => {
 
 let activeRoomAdmin = async (req, res) => {
   try {
-    let { roomId, toggleActive } = req.body.data;
+    let { roomId, toggleActive, admin_id } = req.body.data;
     console.log(">>> CHECK IDROOM ACTIVE <<<: ", roomId, toggleActive);
-    await pool.execute("UPDATE rooms SET disabled = ? WHERE id = ?", [
-      toggleActive,
-      roomId,
-    ]);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
+
+    await pool.execute(
+      "UPDATE rooms SET admin_id = ?, disabled = ? WHERE id = ?",
+      [admin_id, toggleActive, roomId]
+    );
     res.status(200).json({
       errCode: 0,
       message: "active success",
@@ -259,15 +291,20 @@ let getBookingEdit = async (req, res) => {
 let editBookingAdmin = async (req, res) => {
   try {
     const bookingId = parseInt(req.query.bookingId);
+    const { admin_id } = req.body;
     // console.log(">>> CHECK bookingId <<<: ", bookingId);
     // const roomName = req.body.name;
     // console.log(">>> CHECK RES.BODY <<<: ", req.body);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     const dataRes = await adminService.handleEditBooking(bookingId, req.body);
     // console.log(dataRes);
 
     return res.status(200).json({
-      message: "get ok",
+      message: dataRes ? dataRes.message : "get ok",
       // data: dataRoom[0],
     });
   } catch (err) {
@@ -278,9 +315,12 @@ let editBookingAdmin = async (req, res) => {
 
 let deleteBooking = async (req, res) => {
   try {
-    let bookingId = req.body.bookingId;
-    let roomName = req.body.roomName;
-    // console.log(">>> CHECK ROOM ID DELETE <<<: ", bookingId);
+    let { bookingId, roomName, admin_id } = req.body;
+    console.log(">>> CHECK ROOM ID DELETE <<<: ", req.body);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     let dataBooking = await adminService.handleDeleteBooking(
       bookingId,
@@ -305,22 +345,21 @@ let getCustomersAdmin = async (req, res) => {
 
     const pageSize = parseInt(req.query.pageSize);
 
-    const userId = parseInt(req.query.userId);
+    const customerId = parseInt(req.query.customerId);
     // console.log(">>> CHECK PAGE <<<: ", page);
     // console.log(">>> CHECK PAGESIZE <<<: ", pageSize);
-    // console.log(">>> CHECK userId <<<: ", userId);
+    // console.log(">>> CHECK customerId <<<: ", customerId);
     const dataCustomer = await adminService.getCustomers(
       page,
       pageSize,
-      userId
+      customerId
     );
-    // console.log(dataCustomer.userList);
-    // console.log(dataCustomer.userList);
+    // console.log(dataCustomer.customerList);
     // console.log(dataCustomer);
     return res.status(200).json({
       message: "ok",
       total: dataCustomer.total,
-      data: dataCustomer.userList,
+      data: dataCustomer.customerList,
     });
   } catch (err) {
     console.error(err);
@@ -330,12 +369,12 @@ let getCustomersAdmin = async (req, res) => {
 
 let getSearchCustomersAdmin = async (req, res) => {
   try {
-    const [userList, fields] = await pool.execute(
-      "SELECT id,name,email,disabled FROM users"
+    const [customerList, fields] = await pool.execute(
+      "SELECT id,name,email,disabled FROM customers"
     );
-    console.log(userList);
+    console.log(customerList);
     const query = req.query.q; // Lấy thông tin từ query parameter q
-    const results = userList.filter((user) =>
+    const results = customerList.filter((user) =>
       user.name.toLowerCase().includes(query.toLowerCase())
     );
     res.status(200).json({
@@ -350,11 +389,11 @@ let getSearchCustomersAdmin = async (req, res) => {
 
 let editCustomerAdmin = async (req, res) => {
   try {
-    const userId = parseInt(req.query.userId);
-    console.log(">>> CHECK customerId <<<: ", userId);
+    const customerId = parseInt(req.query.customerId);
+    console.log(">>> CHECK customerId <<<: ", customerId);
     console.log(">>> CHECK RES.BODY <<<: ", req.body);
 
-    const dataRes = await adminService.handleEditCustomer(userId, req.body);
+    const dataRes = await adminService.handleEditCustomer(customerId, req.body);
     console.log(dataRes);
 
     return res.status(200).json({
@@ -362,62 +401,77 @@ let editCustomerAdmin = async (req, res) => {
       // data: dataRoom[0],
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal server error" });
+    console.error(">>> CHECK ERR EDIT CUSTOMER <<<", err);
+    res.status(500).json({ error: err || "Internal server error" });
   }
 };
 
 let deleteCustomer = async (req, res) => {
   try {
-    let userId = req.body.customerId;
-    console.log(">>> CHECK userId ID DELETE <<<: ", userId);
+    let customerId = req.body.customerId;
+    let admin_id = req.body.admin_id;
+    console.log(">>> CHECK customerId ID DELETE <<<: ", customerId);
+    console.log(">>> CHECK admin_id ID DELETE <<<: ", admin_id);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     // Get the number of rooms that were booked by the user
     const [rows] = await pool.execute(
-      "SELECT room_id, COUNT(*) AS num_bookings FROM bookings WHERE user_id = ? GROUP BY room_id",
-      [userId]
+      "SELECT room_id, COUNT(*) AS num_bookings FROM bookings WHERE customer_id = ? GROUP BY room_id",
+      [customerId]
     );
 
     console.log(rows);
 
     // Update the number of rooms in the rooms table
     let allUpdatesDone = false;
-    for (let row of rows) {
-      await pool.execute(
-        "UPDATE rooms SET number_of_available_rooms = number_of_available_rooms + ? WHERE id = ?",
-        [row.num_bookings, row.room_id]
-      );
-      allUpdatesDone = true;
-    }
+    if (rows.length > 0) {
+      for (let row of rows) {
+        await pool.execute(
+          "UPDATE rooms SET number_of_available_rooms = number_of_available_rooms + ? WHERE id = ?",
+          [row.num_bookings, row.room_id]
+        );
+        allUpdatesDone = true;
+      }
 
-    // Delete all bookings of the user
-    if (allUpdatesDone) {
-      await pool.execute("DELETE FROM bookings WHERE user_id = ?", [userId]);
+      // Delete all bookings of the user
+      await pool.execute("DELETE FROM bookings WHERE customer_id = ?", [
+        customerId,
+      ]);
+    } else {
+      allUpdatesDone = true;
     }
 
     // Delete the user
     if (allUpdatesDone) {
-      await pool.execute("DELETE FROM users WHERE id = ?", [userId]);
+      await pool.execute("DELETE FROM customers WHERE id = ?", [customerId]);
     }
 
     res.status(200).json({
       errCode: 0,
       message: "delete success",
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (err) {
+    console.error(">>> CHECK ERR DELETE CUSTOMER <<<", err);
+    res.status(500).json({ error: err || "Internal server error" });
   }
 };
 
 let activeCustomerAdmin = async (req, res) => {
   try {
-    let { customerId, toggleActive } = req.body.data;
+    let { admin_id, customerId, toggleActive } = req.body.data;
     console.log(">>> CHECK customerId ACTIVE <<<: ", customerId, toggleActive);
-    await pool.execute("UPDATE users SET disabled = ? WHERE id = ?", [
-      toggleActive,
-      customerId,
-    ]);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
+
+    await pool.execute(
+      "UPDATE customers SET admin_id = ?, disabled = ? WHERE id = ?",
+      [admin_id, toggleActive, customerId]
+    );
     res.status(200).json({
       errCode: 0,
       message: "active success",
@@ -473,11 +527,19 @@ let getSearchFAQsAdmin = async (req, res) => {
 
 let createNewFAQ = async (req, res) => {
   try {
-    let { question, answer } = req.body;
+    let { question, answer, admin_id } = req.body;
     // console.log(">>> CHECK RES.BODY <<<: ", req.body);
 
-    const sql = `INSERT INTO faqs (question, answer) VALUES (?, ?)`;
-    await pool.execute(sql, [question, answer]);
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
+
+    const [hotel] = await pool.execute("SELECT id FROM hotels");
+    // console.log(hotel);
+    const hotelId = hotel[0].id;
+
+    const sql = `INSERT INTO faqs (hotel_id, admin_id, question, answer) VALUES (?,?, ?, ?)`;
+    await pool.execute(sql, [hotelId, admin_id, question, answer]);
 
     return res.status(200).json({
       message: "create success",
@@ -492,7 +554,12 @@ let editFAQAdmin = async (req, res) => {
   try {
     const faqId = parseInt(req.query.faqId);
     console.log(">>> CHECK faqId <<<: ", faqId);
+    const { admin_id } = req.body;
     console.log(">>> CHECK RES.BODY <<<: ", req.body);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     const dataRes = await adminService.handleEditFAQ(faqId, req.body);
     console.log(dataRes);
@@ -509,8 +576,11 @@ let editFAQAdmin = async (req, res) => {
 
 let deleteFAQ = async (req, res) => {
   try {
-    let faqId = req.body.faqId;
-    console.log(">>> CHECK faqId ID DELETE <<<: ", faqId);
+    let { faqId, admin_id } = req.body;
+    console.log(">>> CHECK faqId ID DELETE <<<: ", req.body);
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     await pool.execute("delete from faqs where id = ?", [faqId]);
 
@@ -526,12 +596,15 @@ let deleteFAQ = async (req, res) => {
 
 let activeFAQAdmin = async (req, res) => {
   try {
-    let { faqId, toggleActive } = req.body.data;
+    let { faqId, toggleActive, admin_id } = req.body.data;
     console.log(">>> CHECK customerId ACTIVE <<<: ", faqId, toggleActive);
-    await pool.execute("UPDATE faqs SET disabled = ? WHERE id = ?", [
-      toggleActive,
-      faqId,
-    ]);
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
+    await pool.execute(
+      "UPDATE faqs SET admin_id = ?, disabled = ? WHERE id = ?",
+      [admin_id, toggleActive, faqId]
+    );
     res.status(200).json({
       errCode: 0,
       message: "active success",
@@ -643,8 +716,12 @@ let createNewContact = async (req, res) => {
 
 let deleteContact = async (req, res) => {
   try {
-    let contactId = req.body.contactId;
-    console.log(">>> CHECK contactId ID DELETE <<<: ", contactId);
+    let { contactId, admin_id } = req.body;
+    console.log(">>> CHECK contactId ID DELETE <<<: ", req.body);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     await pool.execute("delete from contacts where id = ?", [contactId]);
 
@@ -703,11 +780,15 @@ let getSearchCuisinesAdmin = async (req, res) => {
 
 let createNewCuisine = async (req, res) => {
   try {
+    const { admin_id } = req.body;
     console.log(req.body);
     const [hotel] = await pool.execute("SELECT id FROM hotels");
     // console.log(hotel);
     const hotelId = hotel[0].id;
     console.log(hotelId);
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     let dataCuisine = await adminService.handleCreateCuisine(hotelId, req.body);
 
@@ -722,12 +803,15 @@ let createNewCuisine = async (req, res) => {
 
 let activeCuisineAdmin = async (req, res) => {
   try {
-    let { cuisineId, toggleActive } = req.body.data;
-    console.log(">>> CHECK cuisineId ACTIVE <<<: ", cuisineId, toggleActive);
-    await pool.execute("UPDATE cuisines SET disabled = ? WHERE id = ?", [
-      toggleActive,
-      cuisineId,
-    ]);
+    let { cuisineId, toggleActive, admin_id } = req.body.data;
+    console.log(">>> CHECK cuisineId ACTIVE <<<: ", req.body.data);
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
+    await pool.execute(
+      "UPDATE cuisines SET admin_id = ?, disabled = ? WHERE id = ?",
+      [admin_id, toggleActive, cuisineId]
+    );
     res.status(200).json({
       errCode: 0,
       message: "active success",
@@ -742,7 +826,11 @@ let editCuisineAdmin = async (req, res) => {
   try {
     const cuisineId = parseInt(req.query.cuisineId);
     console.log(">>> CHECK cuisineId <<<: ", cuisineId);
+    const { admin_id } = req.body;
     console.log(">>> CHECK RES.BODY <<<: ", req.body);
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     const dataRes = await adminService.handleEditCuisine(cuisineId, req.body);
     console.log(dataRes);
@@ -759,8 +847,12 @@ let editCuisineAdmin = async (req, res) => {
 
 let deleteCuisine = async (req, res) => {
   try {
-    let cuisineId = req.body.cuisineId;
-    console.log(">>> CHECK cuisineId ID DELETE <<<: ", cuisineId);
+    let { cuisineId, admin_id } = req.body;
+    console.log(">>> CHECK cuisineId ID DELETE <<<: ", req.body);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     await pool.execute("delete from cuisines where id = ?", [cuisineId]);
 
@@ -819,7 +911,13 @@ let getSearchServicesAdmin = async (req, res) => {
 
 let createNewService = async (req, res) => {
   try {
+    const { admin_id } = req.body;
     console.log(req.body);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
+
     const [hotel] = await pool.execute("SELECT id FROM hotels");
     // console.log(hotel);
     const hotelId = hotel[0].id;
@@ -838,12 +936,15 @@ let createNewService = async (req, res) => {
 
 let activeServiceAdmin = async (req, res) => {
   try {
-    let { serviceId, toggleActive } = req.body.data;
+    let { serviceId, toggleActive, admin_id } = req.body.data;
     console.log(">>> CHECK serviceId ACTIVE <<<: ", serviceId, toggleActive);
-    await pool.execute("UPDATE services SET disabled = ? WHERE id = ?", [
-      toggleActive,
-      serviceId,
-    ]);
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
+    await pool.execute(
+      "UPDATE services SET admin_id = ?, disabled = ? WHERE id = ?",
+      [admin_id, toggleActive, serviceId]
+    );
     res.status(200).json({
       errCode: 0,
       message: "active success",
@@ -860,6 +961,12 @@ let editServiceAdmin = async (req, res) => {
     console.log(">>> CHECK serviceId <<<: ", serviceId);
     console.log(">>> CHECK RES.BODY <<<: ", req.body);
 
+    const { admin_id } = req.body;
+    console.log(">>> CHECK RES.BODY <<<: ", req.body);
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
+
     const dataRes = await adminService.handleEditService(serviceId, req.body);
     console.log(dataRes);
 
@@ -875,8 +982,12 @@ let editServiceAdmin = async (req, res) => {
 
 let deleteService = async (req, res) => {
   try {
-    let serviceId = req.body.serviceId;
-    console.log(">>> CHECK serviceId ID DELETE <<<: ", serviceId);
+    let { serviceId, admin_id } = req.body;
+    console.log(">>> CHECK serviceId ID DELETE <<<: ", req.body);
+
+    if (!(await checkAdminExist(admin_id))) {
+      return res.status(400).json({ error: "admin does not exist" });
+    }
 
     await pool.execute("delete from services where id = ?", [serviceId]);
 
@@ -919,7 +1030,7 @@ let handleAdminLogin = async (req, res) => {
   });
 };
 
-//>>>>>>>>>>>>>>>>>>> USER REGISTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<//
+//>>>>>>>>>>>>>>>>>>> ADMIN REGISTER <<<<<<<<<<<<<<<<<<<<<<<<<<<<//
 let createNewAdmin = async (req, res) => {
   let { id, adminname, password, confirmPassword } = req.body;
   console.log(">>> CHECK RES.BODY <<<: ", req.body);
@@ -959,6 +1070,17 @@ let forgetPasswordAdmin = async (req, res) => {
     errCode: adminData.errCode,
     message: adminData.errMessage,
   });
+};
+
+// FUNCTION
+let checkAdminExist = async (admin_id) => {
+  const [admin] = await pool.execute(`SELECT * FROM admins WHERE id = ? `, [
+    admin_id,
+  ]);
+  if (admin.length === 0) {
+    return false;
+  }
+  return true;
 };
 
 module.exports = {

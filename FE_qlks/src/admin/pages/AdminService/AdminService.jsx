@@ -12,6 +12,9 @@ import "./AdminService.css";
 const PAGE_SIZE = 5;
 
 const AdminService = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const [searchParams] = useSearchParams();
   const pageNumber = searchParams.get("page");
   const navigate = useNavigate();
@@ -27,13 +30,14 @@ const AdminService = () => {
   const handleDelelteService = async (serviceId) => {
     try {
       console.log(serviceId);
-      const res = await deleteService(serviceId);
+      const res = await deleteService(serviceId, admin_id);
       console.log(res);
       setServices((prevServices) =>
         prevServices.filter((service) => service.id !== serviceId)
       );
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "DELETE error");
     }
   };
   const handleConfirmDelete = (serviceId) => {
@@ -47,7 +51,7 @@ const AdminService = () => {
       // console.log(serviceId, serviceDisableb);
       const toggleActive = serviceDisableb === 0 ? 1 : 0;
       // console.log(toggleActive);
-      const res = await activeService(serviceId, toggleActive);
+      const res = await activeService(serviceId, toggleActive, admin_id);
       console.log(res);
       setServices((prevServices) => {
         const updatedServices = prevServices.map((service) => {
@@ -63,6 +67,7 @@ const AdminService = () => {
       });
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "ACTIVE error");
     }
   };
 

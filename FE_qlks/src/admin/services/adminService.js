@@ -60,12 +60,12 @@ const editRoom = (formData, roomId) => {
     },
   });
 };
-const deleteRoom = (roomId) => {
-  return axios.delete(`/api/v1/delete-room`, { data: { roomId } });
+const deleteRoom = (roomId, admin_id) => {
+  return axios.delete(`/api/v1/delete-room`, { data: { roomId, admin_id } });
 };
-const activeRoom = (roomId, toggleActive) => {
+const activeRoom = (roomId, toggleActive, admin_id) => {
   return axios.put(`/api/v1/active-room-admin`, {
-    data: { roomId, toggleActive },
+    data: { roomId, toggleActive, admin_id },
   });
 };
 
@@ -87,9 +87,9 @@ const editBooking = (formData, bookingId) => {
     formData
   );
 };
-const deleteBooking = (bookingId, roomName) => {
+const deleteBooking = (bookingId, roomName, admin_id) => {
   return axios.delete(`/api/v1/delete-booking`, {
-    data: { bookingId, roomName },
+    data: { bookingId, roomName, admin_id },
   });
 };
 
@@ -97,24 +97,29 @@ const deleteBooking = (bookingId, roomName) => {
 const getCustomersAdmin = (
   currentPage = null,
   PAGE_SIZE = null,
-  userId = null
+  customerId = null
 ) => {
   return axios.get(
-    `/api/v1/get-customers-admin?page=${currentPage}&pageSize=${PAGE_SIZE}&userId=${userId}`
+    `/api/v1/get-customers-admin?page=${currentPage}&pageSize=${PAGE_SIZE}&customerId=${customerId}`
   );
 };
 const searchCustomersAdmin = (searchQuery) => {
   return axios.get(`/api/v1/search-customers-admin?q=${searchQuery}`);
 };
-const editCustomer = (formData, userId) => {
-  return axios.put(`/api/v1/edit-customer-admin?userId=${userId}`, formData);
+const editCustomer = (formData, customerId) => {
+  return axios.put(
+    `/api/v1/edit-customer-admin?customerId=${customerId}`,
+    formData
+  );
 };
-const deleteCustomer = (customerId) => {
-  return axios.delete(`/api/v1/delete-customer`, { data: { customerId } });
+const deleteCustomer = (customerId, admin_id) => {
+  return axios.delete(`/api/v1/delete-customer`, {
+    data: { customerId, admin_id },
+  });
 };
-const activeCustomer = (customerId, toggleActive) => {
+const activeCustomer = (customerId, toggleActive, admin_id) => {
   return axios.put(`/api/v1/active-customer-admin`, {
-    data: { customerId, toggleActive },
+    data: { customerId, toggleActive, admin_id },
   });
 };
 
@@ -133,12 +138,14 @@ const addFAQAdmin = (formData) => {
 const editFAQ = (formData, faqId) => {
   return axios.put(`/api/v1/edit-faq-admin?faqId=${faqId}`, formData);
 };
-const deleteFAQ = (faqId) => {
-  return axios.delete(`/api/v1/delete-faq-admin`, { data: { faqId } });
+const deleteFAQ = (faqId, admin_id) => {
+  return axios.delete(`/api/v1/delete-faq-admin`, {
+    data: { faqId, admin_id },
+  });
 };
-const activeFAQ = (faqId, toggleActive) => {
+const activeFAQ = (faqId, toggleActive, admin_id) => {
   return axios.put(`/api/v1/active-faq-admin`, {
-    data: { faqId, toggleActive },
+    data: { faqId, toggleActive, admin_id },
   });
 };
 
@@ -163,8 +170,10 @@ const getContactAdmin = (
 const searchContactAdmin = (searchQuery) => {
   return axios.get(`/api/v1/search-contact-admin?q=${searchQuery}`);
 };
-const deleteContact = (contactId) => {
-  return axios.delete(`/api/v1/delete-contact-admin`, { data: { contactId } });
+const deleteContact = (contactId, admin_id) => {
+  return axios.delete(`/api/v1/delete-contact-admin`, {
+    data: { contactId, admin_id },
+  });
 };
 const createContact = (formData) => {
   return axios.post("/api/v1/add-contact-admin", formData);
@@ -192,12 +201,14 @@ const editCuisine = (formData, cuisineId) => {
     formData
   );
 };
-const deleteCuisine = (cuisineId) => {
-  return axios.delete(`/api/v1/delete-cuisine-admin`, { data: { cuisineId } });
+const deleteCuisine = (cuisineId, admin_id) => {
+  return axios.delete(`/api/v1/delete-cuisine-admin`, {
+    data: { cuisineId, admin_id },
+  });
 };
-const activeCuisine = (cuisineId, toggleActive) => {
+const activeCuisine = (cuisineId, toggleActive, admin_id) => {
   return axios.put(`/api/v1/active-cuisine-admin`, {
-    data: { cuisineId, toggleActive },
+    data: { cuisineId, toggleActive, admin_id },
   });
 };
 
@@ -223,12 +234,14 @@ const editService = (formData, serviceId) => {
     formData
   );
 };
-const deleteService = (serviceId) => {
-  return axios.delete(`/api/v1/delete-service-admin`, { data: { serviceId } });
+const deleteService = (serviceId, admin_id) => {
+  return axios.delete(`/api/v1/delete-service-admin`, {
+    data: { serviceId, admin_id },
+  });
 };
-const activeService = (serviceId, toggleActive) => {
+const activeService = (serviceId, toggleActive, admin_id) => {
   return axios.put(`/api/v1/active-service-admin`, {
-    data: { serviceId, toggleActive },
+    data: { serviceId, toggleActive, admin_id },
   });
 };
 

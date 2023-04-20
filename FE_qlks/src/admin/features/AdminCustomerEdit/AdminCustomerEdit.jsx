@@ -8,6 +8,10 @@ const AdminCustomerEdit = () => {
   // console.log(customerId);
   // const navigate = useNavigate();
   // console.log(roomId);
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
+  // console.log(admin_id);
 
   const [form, setFormValue] = useState({
     id: 0,
@@ -34,7 +38,7 @@ const AdminCustomerEdit = () => {
       return;
     }
     try {
-      const formData = form;
+      const formData = { id, admin_id, email, name };
       console.log(formData);
 
       const response = await editCustomer(formData, customerId);
@@ -42,7 +46,8 @@ const AdminCustomerEdit = () => {
       alert(response.message);
     } catch (error) {
       console.log(error);
-      alert(error);
+      // console.log(error.response.data.error.error);
+      alert(error.response.data.error.error || "EDIT error");
     }
   };
 

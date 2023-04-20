@@ -13,6 +13,9 @@ import "./AdminCuisine.css";
 const PAGE_SIZE = 5;
 
 const AdminCuisine = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const [searchParams] = useSearchParams();
   const pageNumber = searchParams.get("page");
   const navigate = useNavigate();
@@ -28,13 +31,14 @@ const AdminCuisine = () => {
   const handleDelelteCuisine = async (cuisineId) => {
     try {
       console.log(cuisineId);
-      const res = await deleteCuisine(cuisineId);
+      const res = await deleteCuisine(cuisineId, admin_id);
       console.log(res);
       setCuisines((prevCuisines) =>
         prevCuisines.filter((cuisine) => cuisine.id !== cuisineId)
       );
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "DELETE error");
     }
   };
   const handleConfirmDelete = (cuisineId) => {
@@ -48,7 +52,7 @@ const AdminCuisine = () => {
       // console.log(cuisineId, cuisineDisableb);
       const toggleActive = cuisineDisableb === 0 ? 1 : 0;
       // console.log(toggleActive);
-      const res = await activeCuisine(cuisineId, toggleActive);
+      const res = await activeCuisine(cuisineId, toggleActive, admin_id);
       console.log(res);
       setCuisines((prevCuisines) => {
         const updatedCuisines = prevCuisines.map((cuisine) => {
@@ -64,6 +68,7 @@ const AdminCuisine = () => {
       });
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "ACTIVE error");
     }
   };
 

@@ -12,6 +12,9 @@ import "./AdminFAQs.css";
 const PAGE_SIZE = 5;
 
 const AdminFAQs = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const [searchParams] = useSearchParams();
   const pageNumber = searchParams.get("page");
   const navigate = useNavigate();
@@ -28,11 +31,12 @@ const AdminFAQs = () => {
   const handleDeleteFAQs = async (faqId) => {
     try {
       console.log(faqId);
-      const res = await deleteFAQ(faqId);
+      const res = await deleteFAQ(faqId, admin_id);
       console.log(res);
       setFAQs((prevFAQs) => prevFAQs.filter((faq) => faq.id !== faqId));
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "DELETE error");
     }
   };
   const handleConfirmDelete = (faqId) => {
@@ -46,7 +50,7 @@ const AdminFAQs = () => {
       // console.log(faqId, roomDisableb);
       const toggleActive = faqDisableb === 0 ? 1 : 0;
       // console.log(toggleActive);
-      const res = await activeFAQ(faqId, toggleActive);
+      const res = await activeFAQ(faqId, toggleActive, admin_id);
       console.log(res);
       setFAQs((prevFAQs) => {
         const updatedFAQs = prevFAQs.map((faq) => {
@@ -62,6 +66,7 @@ const AdminFAQs = () => {
       });
     } catch (err) {
       console.log(err);
+      alert(err.response.data.error || "ACTIVE error");
     }
   };
 

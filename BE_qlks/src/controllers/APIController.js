@@ -5,7 +5,7 @@ import CRUDService from "../services/CRUDService";
 // var hash = bcrypt.hashSync("B4c0//", salt);
 
 let getAllUsers = async (req, res) => {
-  const [rows, fields] = await pool.execute("SELECT * FROM `users`");
+  const [rows, fields] = await pool.execute("SELECT * FROM `customers`");
 
   return res.status(200).json({
     message: "ok",
@@ -35,6 +35,42 @@ let getRooms = async (req, res) => {
       message: "ok",
       total: dataRoom.total,
       data: dataRoom.roomList,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+let getRoomsRelated = async (req, res) => {
+  // rows la 1 arr chua cac phan tu obj row data trong table
+  try {
+    const roomId = req.query.roomId;
+    const [listRoomRelated] = await pool.execute(
+      "SELECT * FROM rooms WHERE id != ? AND disabled = 0",
+      [roomId]
+    );
+    // console.log(listRoomRelated);
+    // console.log(listRoomRelated.length);
+    let randomIndexes = [];
+    while (randomIndexes.length < 5) {
+      let randomIndex = Math.floor(Math.random() * listRoomRelated.length);
+      if (!randomIndexes.includes(randomIndex)) {
+        randomIndexes.push(randomIndex);
+      }
+    }
+    console.log(randomIndexes);
+
+    const data = [];
+    for (let i = 0; i < randomIndexes.length; i++) {
+      const index = randomIndexes[i];
+      data.push(listRoomRelated[index]);
+    }
+    // console.log(data);
+    return res.status(200).json({
+      message: "ok",
+      // total: dataRoom.total,
+      data: data,
     });
   } catch (err) {
     console.error(err);
@@ -74,7 +110,7 @@ let createBooking = async (req, res) => {
       message: "Thông tin booking của bạn đã được lưu trữ thành công!",
     });
   } catch (err) {
-    console.error(err);
+    console.error(">>> CHECK ERROR BOOKING<<<", err);
     res.status(500).json({ error: err || "Internal server error" });
   }
 };
@@ -134,6 +170,7 @@ module.exports = {
   getAllUsers,
   getInfoHotel,
   getRooms,
+  getRoomsRelated,
   getSearch,
   createBooking,
   getListFAQs,

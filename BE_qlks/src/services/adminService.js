@@ -15,12 +15,14 @@ let handleEditInfoHotelAdmin = (hotelId, dataHotel) => {
         slider_home,
         slider_ins,
         src_ggmap,
+        admin_id,
       } = dataHotel;
       console.log(">>> CHECK DATA HOTEL <<<:", dataHotel);
 
       await pool.execute(
-        "UPDATE hotels SET name = ?, email = ?, address = ?, phone = ?, description = ?, slider_home = ?, slider_ins = ?, src_ggmap = ?  WHERE id = ?",
+        "UPDATE hotels SET admin_id = ?, name = ?, email = ?, address = ?, phone = ?, description = ?, slider_home = ?, slider_ins = ?, src_ggmap = ?  WHERE id = ?",
         [
+          admin_id,
           name,
           email,
           address,
@@ -62,7 +64,7 @@ let getRooms = (page, pageSize) => {
   });
 };
 
-let createRoom = (hotelId, imgPath, dataRoom) => {
+let createRoom = (admin_id, hotelId, imgPath, dataRoom) => {
   return new Promise(async (resolve, reject) => {
     let {
       name,
@@ -77,9 +79,10 @@ let createRoom = (hotelId, imgPath, dataRoom) => {
     const split_image_slider = img_slider.split(",");
     console.log(">>> CHECK SPLIT <<<", split_image_slider);
     try {
-      const sql = `INSERT INTO rooms (hotel_id, name, description, price, number_of_available_rooms, area, view_direction,bed_type, avatar, img_slider) VALUES (?, ?, ?, ?,?,?,?,?,?,?)`;
+      const sql = `INSERT INTO rooms (hotel_id, admin_id, name, description, price, number_of_available_rooms, area, view_direction,bed_type, avatar, img_slider) VALUES (?,?, ?, ?, ?,?,?,?,?,?,?)`;
       const [result] = await pool.execute(sql, [
         hotelId,
+        admin_id,
         name,
         description,
         price,
@@ -118,7 +121,7 @@ let getBookings = (page, pageSize) => {
   });
 };
 
-let handleEditRoom = (roomId, imgPath, dataRoom) => {
+let handleEditRoom = (admin_id, roomId, imgPath, dataRoom) => {
   return new Promise(async (resolve, reject) => {
     try {
       const {
@@ -137,8 +140,9 @@ let handleEditRoom = (roomId, imgPath, dataRoom) => {
       console.log(split_image_slider);
 
       let sql =
-        "UPDATE rooms SET name = ?, description = ?, price = ?, number_of_available_rooms = ?, area = ?, view_direction = ?, bed_type = ?, img_slider = ?";
+        "UPDATE rooms SET admin_id = ?, name = ?, description = ?, price = ?, number_of_available_rooms = ?, area = ?, view_direction = ?, bed_type = ?, img_slider = ?";
       let params = [
+        admin_id,
         name,
         description,
         price,
@@ -180,6 +184,7 @@ let handleEditBooking = (bookingId, dataBooking) => {
         total_price,
         total_stay,
         guest_mess,
+        admin_id,
       } = dataBooking;
       console.log(">>> CHECK DATA BOOKING <<<:", dataBooking);
 
@@ -195,10 +200,18 @@ let handleEditBooking = (bookingId, dataBooking) => {
       console.log(">>> CHECK BOOKING <<< ", booking);
 
       const [room] = await pool.query("SELECT * FROM rooms WHERE id = ?", [
-        room_id,
+        new_room_id_default,
       ]);
       console.log(">>> CHECK ROOM <<< ", room);
 
+      if (
+        room_id !== new_room_id_default &&
+        room[0].number_of_available_rooms <= 0
+      ) {
+        return resolve({ message: "het phong" });
+      }
+
+      console.log("test co xuong duoi day không");
       if (room_id !== new_room_id_default) {
         await pool.query(
           "UPDATE rooms SET number_of_available_rooms = number_of_available_rooms + 1 WHERE id = ?",
@@ -212,12 +225,13 @@ let handleEditBooking = (bookingId, dataBooking) => {
       }
 
       let sql =
-        "UPDATE bookings SET room_id = ?, room_name = ?, checkin_date = ?, checkout_date = ?, guest_name = ?,  guest_phone = ?, guest_mess = ?, total_stay = ?, total_price = ?";
+        "UPDATE bookings SET room_id = ?, admin_id = ?, room_name = ?, checkin_date = ?, checkout_date = ?, guest_name = ?,  guest_phone = ?, guest_mess = ?, total_stay = ?, total_price = ?";
       let params = [];
 
       sql += " WHERE id = ?";
       params.push(
         new_room_id_default,
+        admin_id,
         room_name,
         checkin_date,
         checkout_date,
@@ -263,14 +277,14 @@ let handleDeleteBooking = (bookingId, roomName) => {
   });
 };
 
-let getCustomers = (page = null, pageSize = null, userId = null) => {
+let getCustomers = (page = null, pageSize = null, customerId = null) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let query = "SELECT id, name, email, disabled  FROM users ";
+      let query = "SELECT id, name, email, disabled  FROM customers ";
       let params = [];
       // console.log(page);
       // console.log(pageSize);
-      // console.log(userId);
+      // console.log(customerId);
 
       if (page && pageSize) {
         const limit = pageSize; // Số lượng row mỗi trang
@@ -279,40 +293,43 @@ let getCustomers = (page = null, pageSize = null, userId = null) => {
         params = [offset, limit];
       } else {
         query += "WHERE id=?";
-        params = [userId];
+        params = [customerId];
       }
 
-      const [userList, fields] = await pool.execute(query, params);
+      const [customerList, fields] = await pool.execute(query, params);
       let total = 0;
 
       if (page && pageSize) {
         // Truy vấn số lượng phòng
         const [totalUsers, _] = await pool.execute(
-          "SELECT COUNT(*) as total FROM users "
+          "SELECT COUNT(*) as total FROM customers "
         );
         total = totalUsers[0].total;
       } else {
         total = 1;
       }
 
-      resolve({ userList, total });
+      resolve({ customerList, total });
     } catch (err) {
       reject(err);
     }
   });
 };
 
-let handleEditCustomer = (userId, dataCustomer) => {
+let handleEditCustomer = (customerId, dataCustomer) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { id, name, email, disabled } = dataCustomer;
+      const { id, admin_id, name, email } = dataCustomer;
       console.log(">>> CHECK DATA CUSTOMER <<<:", dataCustomer);
 
-      await pool.execute("UPDATE users SET name = ?, email = ? WHERE id = ?", [
-        name,
-        email,
-        userId,
-      ]);
+      if (!(await checkAdminExist(admin_id))) {
+        return reject({ error: "admin does not exist" });
+      }
+
+      await pool.execute(
+        "UPDATE customers SET admin_id = ?, name = ?, email = ? WHERE id = ?",
+        [admin_id, name, email, customerId]
+      );
 
       resolve({ message: "update ok" });
     } catch (err) {
@@ -364,12 +381,12 @@ let getFAQs = (page = null, pageSize = null, faqId = null) => {
 let handleEditFAQ = (faqId, dataFAQ) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { id, question, answer, disabled } = dataFAQ;
+      const { id, question, answer, disabled, admin_id } = dataFAQ;
       console.log(">>> CHECK DATA FAQ <<<:", dataFAQ);
 
       await pool.execute(
-        "UPDATE faqs SET question = ?, answer = ? WHERE id = ?",
-        [question, answer, faqId]
+        "UPDATE faqs SET admin_id = ?, question = ?, answer = ? WHERE id = ?",
+        [admin_id, question, answer, faqId]
       );
 
       resolve({ message: "update ok" });
@@ -457,14 +474,21 @@ let getCuisines = (page = null, pageSize = null, cuisineId = null) => {
 
 let handleCreateCuisine = (hotelId, dataCuisine) => {
   return new Promise(async (resolve, reject) => {
-    let { name, description, opening_time, closing_time, img_slider } =
-      dataCuisine;
+    let {
+      name,
+      description,
+      opening_time,
+      closing_time,
+      img_slider,
+      admin_id,
+    } = dataCuisine;
     // console.log(dataCuisine);
 
     try {
-      const sql = `INSERT INTO cuisines (hotel_id, name, description, opening_time, closing_time, img_slider) VALUES (?, ?, ?, ?, ?, ?)`;
+      const sql = `INSERT INTO cuisines (hotel_id, admin_id, name, description, opening_time, closing_time, img_slider) VALUES (?, ?, ?, ?, ?, ?, ?)`;
       const [result] = await pool.execute(sql, [
         hotelId,
+        admin_id,
         name,
         description,
         opening_time,
@@ -481,13 +505,20 @@ let handleCreateCuisine = (hotelId, dataCuisine) => {
 let handleEditCuisine = (cuisineId, dataCuisine) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { name, opening_time, closing_time, description, img_slider } =
-        dataCuisine;
+      const {
+        name,
+        opening_time,
+        closing_time,
+        description,
+        img_slider,
+        admin_id,
+      } = dataCuisine;
       console.log(">>> CHECK DATA CUISINE <<<:", dataCuisine);
 
       await pool.execute(
-        "UPDATE cuisines SET name = ?, opening_time = ?, closing_time = ?, description = ?, img_slider = ? WHERE id = ?",
+        "UPDATE cuisines SET admin_id = ?, name = ?, opening_time = ?, closing_time = ?, description = ?, img_slider = ? WHERE id = ?",
         [
+          admin_id,
           name,
           opening_time,
           closing_time,
@@ -542,14 +573,21 @@ let getServices = (page = null, pageSize = null, serviceId = null) => {
 
 let handleCreateService = (hotelId, dataService) => {
   return new Promise(async (resolve, reject) => {
-    let { name, description, opening_time, closing_time, img_slider } =
-      dataService;
+    let {
+      name,
+      description,
+      opening_time,
+      closing_time,
+      img_slider,
+      admin_id,
+    } = dataService;
     // console.log(dataService);
 
     try {
-      const sql = `INSERT INTO services (hotel_id, name, description, opening_time, closing_time, img_slider) VALUES (?, ?, ?, ?, ?, ?)`;
+      const sql = `INSERT INTO services (hotel_id, admin_id, name, description, opening_time, closing_time, img_slider) VALUES (?,?, ?, ?, ?, ?, ?)`;
       const [result] = await pool.execute(sql, [
         hotelId,
+        admin_id,
         name,
         description,
         opening_time,
@@ -566,13 +604,20 @@ let handleCreateService = (hotelId, dataService) => {
 let handleEditService = (serviceId, dataService) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { name, opening_time, closing_time, description, img_slider } =
-        dataService;
+      const {
+        name,
+        opening_time,
+        closing_time,
+        description,
+        img_slider,
+        admin_id,
+      } = dataService;
       console.log(">>> CHECK DATA SERVICE <<<:", dataService);
 
       await pool.execute(
-        "UPDATE services SET name = ?, opening_time = ?, closing_time = ?, description = ?, img_slider = ? WHERE id = ?",
+        "UPDATE services SET admin_id = ?, name = ?, opening_time = ?, closing_time = ?, description = ?, img_slider = ? WHERE id = ?",
         [
+          admin_id,
           name,
           opening_time,
           closing_time,
@@ -717,7 +762,7 @@ let forgetPasswordAdmin = (data) => {
           name,
         ]);
         adminData.errCode = 0;
-        adminData.errMessage = "ok change password user success";
+        adminData.errMessage = "ok change password admin success";
       }
 
       resolve(adminData);
@@ -725,6 +770,17 @@ let forgetPasswordAdmin = (data) => {
       reject(e);
     }
   });
+};
+
+// FUNCTION
+let checkAdminExist = async (admin_id) => {
+  const [admin] = await pool.execute(`SELECT * FROM admins WHERE id = ? `, [
+    admin_id,
+  ]);
+  if (admin.length === 0) {
+    return false;
+  }
+  return true;
 };
 
 module.exports = {

@@ -6,12 +6,16 @@ import "react-time-picker/dist/TimePicker.css";
 import "react-clock/dist/Clock.css";
 
 const AdminAddCuisine = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const [form, setFormValue] = useState({
     name: "",
     opening_time: "",
     closing_time: "",
     description: "",
     img_slider: ["", "", "", "", ""],
+    admin_id,
   });
   //   console.log(form);
 
@@ -65,16 +69,17 @@ const AdminAddCuisine = () => {
       const response = await createCuisine(formData);
       console.log(response);
       alert(response.message);
-      setFormValue({
+      setFormValue((prev) => ({
+        ...prev,
         name: "",
         opening_time: "",
         closing_time: "",
         description: "",
         img_slider: ["", "", "", "", ""],
-      });
+      }));
     } catch (error) {
       console.log(error);
-      alert(error);
+      alert(error.response.data.error || "ADD error");
     }
   };
 

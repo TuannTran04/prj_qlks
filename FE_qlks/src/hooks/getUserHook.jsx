@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import _ from "lodash";
 import { getUser } from "../services/userService";
 
-const useGetUser = (userId) => {
+const useGetUser = (customerId) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getUser(userId);
+        const res = await getUser(customerId);
         console.log(res);
         console.log(res.data);
 
@@ -23,7 +23,7 @@ const useGetUser = (userId) => {
       }
     };
     fetchData();
-  }, [userId]);
+  }, [customerId]);
 };
 
 export default useGetUser;

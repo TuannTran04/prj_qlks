@@ -83,9 +83,15 @@ const initAPIRoute = (app) => {
   router.post("/create-user", userController.createNewUser);
   router.post("/forget-password-user", userController.forgetPasswordUser);
   router.get("/get-user", userController.getUser);
+  router.get("/get-bookings-account", userController.getBookingsAccount);
+  router.get(
+    "/search-bookings-account",
+    userController.getSearchBookingsAccount
+  );
 
   router.get("/get-info-hotel", APIController.getInfoHotel);
   router.get("/get-list-rooms", APIController.getRooms);
+  router.get("/get-list-rooms-related", APIController.getRoomsRelated);
   router.get("/search", APIController.getSearch);
   router.post("/create-booking", APIController.createBooking);
 

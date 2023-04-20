@@ -1,20 +1,20 @@
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import AdminPagination from "../../features/AdminPagination/AdminPagination";
+import AccountPagination from "../../components/layout/AccountPagination/AccountPagination";
 import {
-  getBookingsAdmin,
-  searchBookingsAdmin,
-  deleteBooking,
-} from "../../services/adminService";
-import "./AdminBooking.css";
+  getBookingsAccount,
+  searchBookingsAccount,
+} from "../../services/userService";
+import "./HistoryBookingPage.css";
 
 const PAGE_SIZE = 5;
 
-const AdminBooking = () => {
-  const admin_id = localStorage.getItem("info-admin")
-    ? JSON.parse(localStorage.getItem("info-admin")).id
+const HistoryBookingPage = () => {
+  const user_id = localStorage.getItem("info-user")
+    ? JSON.parse(localStorage.getItem("info-user")).id
     : "";
+  console.log(user_id);
   const [searchParams] = useSearchParams();
   const pageNumber = searchParams.get("page");
   const navigate = useNavigate();
@@ -27,25 +27,6 @@ const AdminBooking = () => {
   const newUrl = `${window.location.pathname}?page=${currentPage}`;
   window.history.pushState(null, null, newUrl);
 
-  const handleDeleteBooking = async (bookingId, roomName) => {
-    try {
-      console.log(bookingId);
-      const res = await deleteBooking(bookingId, roomName, admin_id);
-      console.log(res);
-      setBookings((prevBookings) =>
-        prevBookings.filter((room) => room.id !== bookingId)
-      );
-    } catch (err) {
-      console.log(err);
-      alert(err.response.data.error || "DELETE error");
-    }
-  };
-  const handleConfirmDelete = (bookingId, roomName) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa đơn này không?")) {
-      handleDeleteBooking(bookingId, roomName);
-    }
-  };
-
   const handleSearchInputChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -54,11 +35,11 @@ const AdminBooking = () => {
     const renderBookings = async () => {
       try {
         if (searchQuery.trim() !== "") {
-          const res = await searchBookingsAdmin(searchQuery);
+          const res = await searchBookingsAccount(searchQuery, user_id);
           console.log(res);
           setBookings(res.data);
         } else {
-          const res = await getBookingsAdmin(currentPage, PAGE_SIZE);
+          const res = await getBookingsAccount(currentPage, PAGE_SIZE, user_id);
           // console.log(res.total);
           setBookings(res.data);
           setTotalPages(Math.ceil(res.total / PAGE_SIZE));
@@ -76,12 +57,12 @@ const AdminBooking = () => {
   }, [searchParams]);
 
   return (
-    <div className="adminBooking_page">
-      <div className="adminBooking_header">
-        <h2>Manage Booking</h2>
+    <div className="historyBooking_page">
+      <div className="historyBooking_header">
+        <h2>History Booking</h2>
       </div>
 
-      <form className="adminBooking_search">
+      <form className="historyBooking_search">
         <label>
           Search Booking:
           <input
@@ -93,9 +74,9 @@ const AdminBooking = () => {
         </label>
       </form>
 
-      <div className="adminBooking_wrap_list">
-        <div className="adminBooking_list">
-          <table className="adminBooking_table">
+      <div className="historyBooking_wrap_list">
+        <div className="historyBooking_list">
+          <table className="historyBooking_table">
             <thead>
               <tr>
                 <th>ID</th>
@@ -107,7 +88,6 @@ const AdminBooking = () => {
                 <th>Checkout</th>
                 <th>Message</th>
                 <th>Total Price</th>
-                <th>Actions</th>
               </tr>
             </thead>
 
@@ -130,43 +110,13 @@ const AdminBooking = () => {
                     <td style={{ width: "200px" }}>
                       {parseInt(booking.total_price).toLocaleString("en-US")}
                     </td>
-                    <td
-                      // style={{ width: "150px" }}
-                      className="adminBooking_action"
-                    >
-                      <form action="">
-                        <button
-                          className="adminBooking_action-edit"
-                          onClick={(e) => {
-                            navigate(`/admin/admin-edit-booking/${booking.id}`);
-                          }}
-                        >
-                          <i className="fa-solid fa-pen"></i>
-                        </button>
-                      </form>
-
-                      <form action="">
-                        <button
-                          className="adminBooking_action-delete"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            return handleConfirmDelete(
-                              booking.id,
-                              booking.room_name
-                            );
-                          }}
-                        >
-                          <i className="fa-solid fa-trash"></i>
-                        </button>
-                      </form>
-                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
-        <AdminPagination
+        <AccountPagination
           paginationData={{
             currentPage,
             totalPages,
@@ -178,4 +128,4 @@ const AdminBooking = () => {
   );
 };
 
-export default AdminBooking;
+export default HistoryBookingPage;

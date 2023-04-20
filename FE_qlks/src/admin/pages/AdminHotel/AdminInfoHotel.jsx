@@ -35,8 +35,8 @@ const AdminInfoHotel = () => {
                 <th>ID</th>
                 <th>Name</th>
                 <th>Address</th>
-                <th>Phone</th>
                 <th>Email</th>
+                <th>Phone</th>
                 <th>Description</th>
                 <th>Actions</th>
               </tr>

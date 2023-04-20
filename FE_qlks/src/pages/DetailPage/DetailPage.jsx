@@ -5,24 +5,25 @@ import "./DetailPage.css";
 import { SliderDetail } from "../../features/SliderDetail/SliderDetail";
 import TabsDetail from "../../features/TabsDetail/TabsDetail";
 import FormDetail from "../../features/FormDetail/FormDetail";
+import RelatedRooms from "../../features/RelatedRooms/RelatedRooms";
 
 const DetailPage = () => {
   const navigate = useNavigate();
   // get param id on path
   const { id, name } = useParams();
-  console.log(id, name);
+  // console.log(id, name);
 
   const location = useLocation();
-  console.log(location.state);
+  // console.log(location.state);
 
   const roomData = location.state && location.state.roomData;
-  console.log(roomData);
+  // console.log(roomData);
   // Check if location state exists
   if (!roomData) {
     navigate("/page-not-found");
     return <div>Loading...</div>;
   }
-  console.log(location.state.roomData);
+  // console.log(location.state.roomData);
 
   return (
     <div className="detail_page">
@@ -51,6 +52,8 @@ const DetailPage = () => {
         <TabsDetail roomData={roomData} />
 
         <hr style={{ opacity: 0.4 }} />
+
+        <RelatedRooms />
       </div>
     </div>
   );

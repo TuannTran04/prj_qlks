@@ -12,9 +12,10 @@ let handleUserLogin = (email, password) => {
 
       if (isExist) {
         // user already exist
-        let [user] = await pool.execute("select * from users where email = ?", [
-          email,
-        ]);
+        let [user] = await pool.execute(
+          "select * from customers where email = ?",
+          [email]
+        );
         console.log(user);
 
         if (user) {
@@ -53,9 +54,10 @@ let handleUserLogin = (email, password) => {
 let checkUserEmail = (userEmail) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let [user] = await pool.execute("select * from users where email = ?", [
-        userEmail,
-      ]);
+      let [user] = await pool.execute(
+        "select * from customers where email = ?",
+        [userEmail]
+      );
       // console.log(">>> CHECK USER EMAIL <<<: ", user);
 
       if (user.length === 1) {
@@ -72,9 +74,10 @@ let checkUserEmail = (userEmail) => {
 let checkUserName = (userName) => {
   return new Promise(async (res, rej) => {
     try {
-      let [user] = await pool.execute("select * from users where name = ?", [
-        userName,
-      ]);
+      let [user] = await pool.execute(
+        "select * from customers where name = ?",
+        [userName]
+      );
       //   console.log(user);
 
       if (user.length === 1) {
@@ -113,7 +116,7 @@ let createNewUser = (data) => {
         userData.errMessage = "email nay da ton tai!!!";
       } else {
         await pool.execute(
-          "insert into users(email, name, password) values(?, ?, ?)",
+          "insert into customers(email, name, password) values(?, ?, ?)",
           [email, name, hashPasswordFromBrcypt]
         );
         userData.errCode = 0;
@@ -143,10 +146,10 @@ let forgetPasswordUser = (data) => {
         userData.errCode = 1;
         userData.errMessage = "email nay khong ton tai!!!";
       } else {
-        await pool.execute("UPDATE users SET password = ? WHERE email = ?", [
-          hashPasswordFromBrcypt,
-          email,
-        ]);
+        await pool.execute(
+          "UPDATE customers SET password = ? WHERE email = ?",
+          [hashPasswordFromBrcypt, email]
+        );
         userData.errCode = 0;
         userData.errMessage = "ok change password user success";
       }
@@ -169,9 +172,30 @@ let hashUserPassword = async (password) => {
   });
 };
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< //
+let getBookings = (page, pageSize, customerId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const limit = pageSize; // Số lượng phòng mỗi trang
+      const offset = (page - 1) * limit; // Vị trí bắt đầu lấy dữ liệu
+      const [bookingList, fields] = await pool.execute(
+        `SELECT * FROM bookings  WHERE customer_id = ? LIMIT ?, ?`,
+        [customerId, offset, limit]
+      );
+      // Truy vấn số lượng phòng
+      const [totalBooking, _] = await pool.execute(
+        "SELECT COUNT(*) as total FROM bookings "
+      );
+      const total = totalBooking[0].total;
+      resolve({ bookingList, total });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
 
 module.exports = {
   handleUserLogin,
   createNewUser,
   forgetPasswordUser,
+  getBookings,
 };

@@ -3,9 +3,13 @@ import { addFAQAdmin } from "../../services/adminService";
 import "./AdminAddFAQ.css";
 
 const AdminAddFAQ = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const [form, setFormValue] = useState({
     question: "",
     answer: "",
+    admin_id,
   });
   console.log(form);
 
@@ -27,19 +31,20 @@ const AdminAddFAQ = () => {
       return;
     }
     try {
-      const formData = { question, answer };
+      const formData = { question, answer, admin_id };
       console.log(formData);
 
       const response = await addFAQAdmin(formData);
       console.log(response);
       alert(response.message);
-      setFormValue({
+      setFormValue((prev) => ({
+        ...prev,
         question: "",
         answer: "",
-      });
+      }));
     } catch (error) {
       console.log(error);
-      alert(error);
+      alert(error.response.data.error || "ADD error");
     }
   };
 

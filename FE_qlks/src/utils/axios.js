@@ -8,8 +8,8 @@ import _ from "lodash";
 // dotenv.config();
 
 const instance = axios.create({
-  baseURL: "http://localhost:9090",
-  // baseURL: process.env.REACT_APP_BACKEND_URL,
+  // baseURL: "http://localhost:9090",
+  baseURL: process.env.REACT_APP_BACKEND_URL,
   // withCredentials: true
 });
 

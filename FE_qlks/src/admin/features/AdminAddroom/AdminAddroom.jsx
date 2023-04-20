@@ -3,6 +3,9 @@ import { addRoomAdmin } from "../../services/adminService";
 import "./AdminAddroom.css";
 
 const AdminAddroom = () => {
+  const admin_id = localStorage.getItem("info-admin")
+    ? JSON.parse(localStorage.getItem("info-admin")).id
+    : "";
   const [form, setFormValue] = useState({
     name: "",
     description: "",
@@ -13,6 +16,7 @@ const AdminAddroom = () => {
     bed_type: "",
     image: null,
     img_slider: ["", "", "", "", ""],
+    admin_id,
   });
   // console.log(form);
   const inputRefFile = useRef(null);
@@ -90,7 +94,8 @@ const AdminAddroom = () => {
       const response = await addRoomAdmin(formData);
       console.log(response);
       alert(response.message);
-      setFormValue({
+      setFormValue((prev) => ({
+        ...prev,
         name: "",
         description: "",
         price: "",
@@ -100,11 +105,11 @@ const AdminAddroom = () => {
         bed_type: "",
         image: null,
         img_slider: ["", "", "", "", ""],
-      });
+      }));
       inputRefFile.current.value = "";
     } catch (error) {
       console.log(error);
-      alert(error);
+      alert(error.response.data.error || "ADD error");
     }
   };
 
