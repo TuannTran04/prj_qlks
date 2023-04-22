@@ -28,6 +28,18 @@ const forgetPassword = (email, password, confirmPassword) => {
 const getUser = (customerId) => {
   return axios.get(`/api/v1/get-user?customerId=${customerId}`);
 };
+const changeInfoUser = (formData, customerId) => {
+  return axios.put(
+    `/api/v1/change-info-user?customerId=${customerId}`,
+    formData
+  );
+};
+const changePasswordUser = (formData, customerId) => {
+  return axios.post(
+    `/api/v1/change-password-user?customerId=${customerId}`,
+    formData
+  );
+};
 
 const getBookingsAccount = (currentPage, PAGE_SIZE, customerId) => {
   return axios.get(
@@ -44,6 +56,8 @@ export {
   handleLogin,
   registerUser,
   getUser,
+  changeInfoUser,
+  changePasswordUser,
   forgetPassword,
   getBookingsAccount,
   searchBookingsAccount,

@@ -40,6 +40,8 @@ import AdminInfoHotel from "./admin/pages/AdminHotel/AdminInfoHotel";
 import AdminInfoHotelEdit from "./admin/features/AdminInfoHotelEdit/AdminInfoHotelEdit";
 import AccountPage from "./pages/AccountPage/AccountPage";
 import HistoryBookingPage from "./pages/HistoryBookingPage/HistoryBookingPage";
+import ChangeInfoPage from "./pages/ChangeInfoPage/ChangeInfoPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage/ChangePasswordPage";
 
 function App() {
   const { pathname } = useLocation();
@@ -83,6 +85,14 @@ function App() {
           path="/account-page"
           element={isUserLoggedIn ? <AccountPage /> : <Navigate to="/" />}
         >
+          <Route
+            path="/account-page/change-info"
+            element={<ChangeInfoPage />}
+          />
+          <Route
+            path="/account-page/change-password"
+            element={<ChangePasswordPage />}
+          />
           <Route
             path="/account-page/history-booking"
             element={<HistoryBookingPage />}

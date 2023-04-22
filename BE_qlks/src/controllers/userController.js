@@ -149,6 +149,68 @@ let getSearchBookingsAccount = async (req, res) => {
   }
 };
 
+let changeInfoUser = async (req, res) => {
+  try {
+    const customerId = parseInt(req.query.customerId);
+    console.log(">>> CHECK customerId <<<: ", customerId);
+
+    if (!(await checkUserExist(customerId))) {
+      return res.status(400).json({ error: "user does not exist" });
+    }
+
+    const dataRes = await userService.handleChangeInfoUser(
+      customerId,
+      req.body
+    );
+    console.log(dataRes);
+
+    return res.status(200).json({
+      message: "change info ok",
+      // data: dataRoom[0],
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+let changePasswordUser = async (req, res) => {
+  try {
+    const customerId = parseInt(req.query.customerId);
+    console.log(">>> CHECK customerId <<<: ", customerId);
+    if (!(await checkUserExist(customerId))) {
+      return res.status(400).json({ error: "user does not exist" });
+    }
+
+    console.log(">>> CHECK dataUser <<<: ", req.body);
+
+    let userData = await userService.handleChangePasswordUser(
+      customerId,
+      req.body
+    );
+    console.log(userData);
+
+    return res.status(200).json({
+      message: "change password ok",
+      // data: dataRoom[0],
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ err });
+  }
+};
+
+// FUNCTION
+let checkUserExist = async (customerId) => {
+  const [user] = await pool.execute(`SELECT * FROM customers WHERE id = ? `, [
+    customerId,
+  ]);
+  if (user.length === 0) {
+    return false;
+  }
+  return true;
+};
+
 module.exports = {
   handleLogin,
   createNewUser,
@@ -156,4 +218,6 @@ module.exports = {
   getUser,
   getBookingsAccount,
   getSearchBookingsAccount,
+  changeInfoUser,
+  changePasswordUser,
 };

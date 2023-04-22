@@ -193,9 +193,64 @@ let getBookings = (page, pageSize, customerId) => {
   });
 };
 
+let handleChangeInfoUser = (customerId, dataUser) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { id, name, email } = dataUser;
+      console.log(">>> CHECK DATA CUStomerS <<<:", dataUser);
+
+      await pool.execute(
+        "UPDATE customers SET name = ?, email = ? WHERE id = ?",
+        [name, email, customerId]
+      );
+
+      resolve({ message: "update ok" });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+let handleChangePasswordUser = (customerId, dataUser) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let { oldPassword, newPassword, confirmNewPassword } = dataUser;
+      console.log(">>> CHECK dataUser <<<: ", dataUser);
+
+      let [user] = await pool.execute("select * from customers where id = ?", [
+        customerId,
+      ]);
+      console.log(user);
+
+      let checkOldPassword = await bcrypt.compareSync(
+        oldPassword,
+        user[0].password
+      );
+      console.log(">>> Check Old Password <<<", checkOldPassword);
+
+      if (checkOldPassword) {
+        let hashPasswordFromBrcypt = await hashUserPassword(newPassword);
+
+        await pool.execute("UPDATE customers SET password = ? WHERE id = ?", [
+          hashPasswordFromBrcypt,
+          customerId,
+        ]);
+      } else {
+        reject({ err: "Mật khẩu cũ không đúng." });
+      }
+
+      resolve({ message: "change password ok" });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
   createNewUser,
   forgetPasswordUser,
   getBookings,
+  handleChangeInfoUser,
+  handleChangePasswordUser,
 };

@@ -43,7 +43,7 @@ const AccountSidebar = ({ location }) => {
 
           <li className="accountSidebar_list_devider"></li>
 
-          {/* {arrTab_2.map((tab, i) => (
+          {arrTab_2.map((tab, i) => (
             <li
               key={i}
               className={getTabClass(tab.path) + " accountSidebar_item"}
@@ -53,7 +53,7 @@ const AccountSidebar = ({ location }) => {
                 <span>{tab.name}</span>
               </Link>
             </li>
-          ))} */}
+          ))}
         </ul>
       </div>
     </div>
